@@ -125,16 +125,16 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 
 		const zh = {
-			nav: "规则设定",
-			"dock.clean": "清洗",
-			"dock.drill": "演练台",
-			"dock.toggle": "dsh-purge",
-			"dock.newSession": "dsh-purge",
-			"dock.inSession": "dsh-purge",
-			"dock.redteam": "演练台",
-			"dock.full": "全面浏览",
-			"dock.close": "收起",
-			"dock.unauthorized": "未授权",
+			"page.nav": "Purge",
+			"page.title": "Purge",
+			"page.lead": "管理提示词、规则、技能与演练环境；改完点「应用」，重启生效。",
+			"page.seg.armor": "补丁",
+			"page.seg.rules": "规则",
+			"page.seg.skills": "技能",
+			"page.seg.drill": "演练台",
+			"page.drill.lead": "演练台只在你完成授权后可进入。授权一次即可，之后可随时使用。",
+			"page.drill.authorize": "完成授权",
+			"page.drill.unavailable": "演练台资源尚未加载，重启宿主后再试。",
 			"welcome.title": "用户须知",
 			"welcome.lead": "首次安装本插件时请阅读以下说明。确认后本窗不再弹出。",
 			"welcome.warn": "本插件按 MIT 许可证提供。请只在有权管理的机器或已获授权的环境中使用。",
@@ -157,8 +157,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"auth.check.ban": "我确认禁止任何违法用途。未完成本授权，不得使用演练台。",
 			"auth.no": "暂不进入",
 			"auth.ok": "确认授权",
+			"auth.ok.page": "确认授权",
 			"auth.ok.tab": "确认授权并进入演练台",
-			"auth.ok.full": "确认授权并全面浏览",
 			"auth.ok.env": "确认授权并打开环境适配",
 			"envGate.title": "环境还没配好",
 			"envGate.lead": "红队模式发送前需要本机工具。未检测到可用环境时，先去环境适配，或确认暂不配置。",
@@ -423,16 +423,16 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		};
 
 		const en = {
-			nav: "Rules",
-			"dock.clean": "Clean",
-			"dock.drill": "Drill",
-			"dock.toggle": "dsh-purge",
-			"dock.newSession": "dsh-purge",
-			"dock.inSession": "dsh-purge",
-			"dock.redteam": "Drill",
-			"dock.full": "Full view",
-			"dock.close": "Collapse",
-			"dock.unauthorized": "Unauthorized",
+			"page.nav": "Purge",
+			"page.title": "Purge",
+			"page.lead": "Local prompts, rules, skills, and drill. Press Apply, then restart.",
+			"page.seg.armor": "Patches",
+			"page.seg.rules": "Rules",
+			"page.seg.skills": "Skills",
+			"page.seg.drill": "Drill",
+			"page.drill.lead": "The drill console becomes available after a one-time authorization.",
+			"page.drill.authorize": "Authorize",
+			"page.drill.unavailable": "Drill assets are not loaded yet. Restart the host and try again.",
 			"welcome.title": "User notice",
 			"welcome.lead": "Please read this on first install. After you confirm, it will not appear again.",
 			"welcome.warn": "Provided under the MIT License. Use it only on machines or in environments you are authorized to manage.",
@@ -455,8 +455,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"auth.check.ban": "I will not use this for any illegal purpose. Without this authorization the drill console stays closed.",
 			"auth.no": "Not now",
 			"auth.ok": "Authorize",
+			"auth.ok.page": "Authorize",
 			"auth.ok.tab": "Authorize and open Drill",
-			"auth.ok.full": "Authorize and open Full view",
 			"auth.ok.env": "Authorize and open Env adapt",
 			"envGate.title": "Environment is not ready",
 			"envGate.lead": "Red team mode needs local tools before you send. If none are available, open Env adapt or confirm you will continue without them.",
@@ -858,54 +858,42 @@ body[data-ds-dark-theme] .dshp-restart-card .dshp-btn-primary,body[data-ds-dark-
 @media (max-width:640px){.dshp-metrics{grid-template-columns:1fr}.dshp-ruleitem{flex-wrap:wrap}.dshp-rule-ops{width:100%;justify-content:flex-end}}
 @media (prefers-reduced-motion:reduce){.dshp-btn,.dshp-bar>i{transition:none}.dshp-skel{animation:none}}
 
-.dshp-dock{position:fixed;top:12px;right:12px;z-index:10050;display:flex;flex-direction:column;width:var(--dshp-dock-w,620px);height:var(--dshp-dock-h,72vh);min-width:380px;min-height:320px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);box-sizing:border-box;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,var(--dshp-paper,#1c1c1c)) 52%,transparent);backdrop-filter:blur(22px) saturate(1.35);-webkit-backdrop-filter:blur(22px) saturate(1.35);border:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,var(--dshp-line,#555)) 65%,transparent);border-radius:12px;box-shadow:0 18px 48px color-mix(in srgb,#000 30%,transparent),0 0 0 1px color-mix(in srgb,#fff 6%,transparent);pointer-events:auto;color:var(--dsw-alias-label-primary,var(--dshp-ink,#f2f2f2));overflow:visible}
-.dshp-dock[data-open="0"]{display:none}
-.dshp-launch{position:fixed;right:16px;bottom:16px;z-index:10040;appearance:none;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 55%,transparent);border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#1c1c1c) 72%,transparent);color:var(--dsw-alias-label-primary,#f2f2f2);cursor:pointer;font:13px/1 inherit;box-shadow:0 8px 22px color-mix(in srgb,#000 28%,transparent);pointer-events:auto}
-.dshp-launch:hover{border-color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent)}
-.dshp-launch[data-open="1"]{display:none}
-.dshp-dock-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,var(--dshp-line,#555)) 55%,transparent);background:transparent;cursor:grab;user-select:none;touch-action:none;color:var(--dsw-alias-label-primary,var(--dshp-ink,#f2f2f2));border-radius:12px 12px 0 0}
-.dshp-dock-head:active{cursor:grabbing}
-.dshp-dock-head b{font-size:14px;font-weight:600;color:inherit;text-shadow:0 1px 0 color-mix(in srgb,#000 18%,transparent)}
-.dshp-dock-head button{cursor:pointer;color:inherit;background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,rgba(127,127,127,.18)) 55%,transparent)}
-.dshp-dock-tabs{display:flex;gap:4px;padding:0 12px;border-bottom:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,var(--dshp-line,#555)) 55%,transparent);background:transparent}
-.dshp-dock-tab{appearance:none;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--dsw-alias-label-secondary,var(--dshp-mute,#b8b4ac));border-radius:0;padding:10px 14px 8px;margin-bottom:-1px;cursor:pointer;font:13px/1.2 inherit;text-shadow:0 1px 0 color-mix(in srgb,#000 12%,transparent)}
-.dshp-dock-tab:hover{color:var(--dsw-alias-label-primary,var(--dshp-ink,#f2f2f2))}
-.dshp-dock-tab.on{color:var(--dsw-alias-label-primary,var(--dshp-ink,#f2f2f2));font-weight:600;border-bottom-color:var(--dsw-alias-brand-primary,#6dbf8c);background:transparent}
-.dshp-dock-body{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;background:transparent;border-radius:0 0 12px 12px}
-.dshp-dock-body .dshp-root{max-width:none;height:100%;flex:1;min-height:0;overflow:auto;background:transparent!important;--dshp-bg:transparent;--dshp-paper:color-mix(in srgb,var(--dshp-ink) 7%,transparent);--dshp-fill:color-mix(in srgb,var(--dshp-ink) 6%,transparent);--dshp-line:color-mix(in srgb,var(--dshp-ink) 20%,transparent);--dshp-accent-soft:color-mix(in srgb,var(--dshp-accent) 22%,transparent)}
-.dshp-dock-body .dshp-panel,.dshp-dock-body .dshp-metric,.dshp-dock-body .dshp-group,.dshp-dock-body .dshp-editor,.dshp-dock-body .dshp-active,.dshp-dock-body .dshp-ask,.dshp-dock-body .dshp-create,.dshp-dock-body .dshp-rulelist,.dshp-dock-body .dshp-table,.dshp-dock-body .dshp-ruleitem,.dshp-dock-body .dshp-cwd-list,.dshp-dock-body .dshp-cwd-item{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#f7f4ee) 74%,transparent)!important;border-color:color-mix(in srgb,var(--dsw-alias-brand-primary,#6d8f78) 32%,transparent)!important;color:var(--dshp-ink)!important;box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 32%,transparent);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3)}
-.dshp-dock-body .dshp-field,.dshp-dock-body .dshp-area{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fff) 88%,transparent)!important;color:var(--dshp-ink)!important;border-color:color-mix(in srgb,var(--dsw-alias-border-l1,#8a8478) 72%,transparent)!important}
-.dshp-dock-body select.dshp-field,.dshp-dock-body .dshp-field.dshp-ver{background:var(--dsw-alias-bg-layer-1,#fff)!important;color:var(--dshp-ink)!important;color-scheme:inherit}
-.dshp-dock[data-theme="white"] select.dshp-field option,.dshp-dock[data-theme="white"] .dshp-field.dshp-ver option{background:#fff;color:#16140f}
-.dshp-dock[data-theme="dusk"] select.dshp-field option,.dshp-dock[data-theme="dusk"] .dshp-field.dshp-ver option{background:#1b1d22;color:#f4f1ea}
-.dshp-dock-body .dshp-title,.dshp-dock-body .dshp-sub h4,.dshp-dock-body .dshp-group-h strong,.dshp-dock-body .dshp-metric b,.dshp-dock-body .dshp-rule-name{font-family:inherit;font-weight:650;letter-spacing:0;color:var(--dshp-ink)!important;text-shadow:none}
-.dshp-dock-body .dshp-mute,.dshp-dock-body .dshp-kicker,.dshp-dock-body .dshp-metric span,.dshp-dock-body .dshp-group-h em,.dshp-dock-body .dshp-count,.dshp-dock-body .dshp-rule-meta,.dshp-dock-body .dshp-hint{color:var(--dshp-mute)!important;font-weight:500;text-shadow:none}
-.dshp-dock-body .rt-dock{position:relative;inset:auto;width:100%!important;height:100%;max-width:none!important;flex:1;min-height:0;min-width:0;display:flex!important;flex-direction:column;box-shadow:none;border:0;transform:none!important;opacity:1!important;pointer-events:auto!important;background:transparent!important}
-.dshp-dock-body .rt-grip{display:none!important}
-.dshp-dock-body .rt-embedded>.rt-head,.dshp-dock-body .rt-tabs,.dshp-dock-body .rt-foot{flex:none}
-.dshp-dock-body .rt-body{flex:1;min-height:0;overflow:hidden!important;background:transparent!important}
-.dshp-dock-body .rt-main{min-height:0;flex:1;overflow:hidden}
-.dshp-dock-body .rt-pane{min-height:0;overflow:auto!important}
-.dshp-dock-body .rt-embedded>.rt-head{padding:8px 12px}
-.dshp-dock-body .rt-embedded>.rt-head .rt-title{font-size:14px;letter-spacing:0}
-.dshp-dock-body .rt-tabs{gap:2px;padding:6px 10px 0;flex-wrap:wrap}
-.dshp-dock-body .rt-tab{border-radius:0;border-bottom:2px solid transparent;margin-bottom:-1px;padding:8px 9px 7px;background:transparent;font-size:14px}
-.dshp-dock-body .rt-tab.on{border-bottom-color:var(--dsw-alias-brand-primary,#6d8f78);background:transparent;font-weight:650}
-.dshp-dock-body .rt-row:hover,.dshp-dock-body .rt-item:hover,.dshp-dock-body .rt-item.on,.dshp-dock-body .rt-seg:hover,.dshp-dock-body .rt-seg.on,.dshp-dock-body .rt-vrow:hover,.dshp-dock-body .rt-score-row:hover{background:var(--rt-surf-2)!important}
+/* 设置页：页头 + 分段，内容一次只摊一段 */
+.dshp-page{max-width:760px;gap:16px;padding:4px 0 24px}
+.dshp-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.dshp-page-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.dshp-page .dshp-title{font-size:22px;line-height:30px;letter-spacing:.01em}
+.dshp-page .dshp-panel .dshp-title{font-size:17px;line-height:24px}
+.dshp-page-lead{margin:0;font-size:13px;line-height:20px;color:var(--dshp-mute);max-width:54ch}
+.dshp-page .dshp-panel{border-radius:12px;box-shadow:0 1px 2px color-mix(in srgb,var(--dshp-ink) 6%,transparent)}
+.dshp-page .dshp-metrics{grid-template-columns:repeat(auto-fit,minmax(165px,1fr))}
+.dshp-page .dshp-head{margin-bottom:12px}
+.dshp-page .dshp-head .dshp-page-lead{font-size:12.5px}
+.dshp-segbar{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid var(--dshp-line);border-radius:10px;background:var(--dshp-fill);flex:none}
+.dshp-seg{appearance:none;border:0;background:transparent;color:var(--dshp-mute);font:inherit;font-size:13px;line-height:20px;padding:4px 12px;border-radius:7px;cursor:pointer;white-space:nowrap;transition:background .15s var(--dshp-ease),color .15s var(--dshp-ease)}
+.dshp-seg:hover{color:var(--dshp-ink)}
+.dshp-seg.on{background:var(--dshp-paper);color:var(--dshp-ink);box-shadow:0 1px 2px color-mix(in srgb,var(--dshp-ink) 12%,transparent)}
+.dshp-seg:focus-visible{outline:2px solid var(--dshp-accent);outline-offset:1px}
+/* 内嵌演练台：高度给足，内部滚动交给演练台自己 */
+.dshp-embed{display:flex;flex-direction:column;height:min(70vh,640px);min-height:420px;border:1px solid var(--dshp-line);border-radius:12px;background:var(--dshp-paper);overflow:hidden}
+.dshp-embed .rt-dock{position:relative;inset:auto;width:100%!important;height:100%;max-width:none!important;flex:1;min-height:0;display:flex!important;flex-direction:column;border:0;border-radius:0;box-shadow:none;background:transparent!important;backdrop-filter:none}
+.dshp-embed .rt-body{flex:1;min-height:0;overflow:hidden}
+.dshp-embed .rt-main{min-height:0;flex:1;overflow:hidden}
+.dshp-embed .rt-pane{min-height:0;overflow:auto}
+.dshp-embed .rt-embedded>.rt-head,.dshp-embed .rt-tabs,.dshp-embed .rt-foot{flex:none}
+.dshp-embed .rt-tab{font-size:13.5px}
+.dshp-embed .rt-err{font-weight:600}
+.dshp-embed .rt-rep-http,.dshp-embed pre{background:color-mix(in srgb,var(--dshp-ink) 5%,transparent);border:1px solid var(--dshp-line);border-radius:6px}
+@media (max-width:640px){.dshp-page-head{flex-direction:column;align-items:stretch}.dshp-segbar{align-self:flex-start;max-width:100%;overflow:auto}.dshp-page .dshp-panel{padding:14px}.dshp-page .dshp-title{font-size:20px}.dshp-page .dshp-table{display:block;font-size:12px}.dshp-page .dshp-table thead{display:none}.dshp-page .dshp-table tbody{display:block}.dshp-page .dshp-table tr{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 10px;border-bottom:1px solid var(--dshp-line)}.dshp-page .dshp-table tr:last-child{border-bottom:0}.dshp-page .dshp-table td{display:block;padding:0;border:0}.dshp-page .dshp-table th:first-child,.dshp-page .dshp-table .dshp-id{display:none}.dshp-page .dshp-table td:nth-child(2){flex:1 1 100%;min-width:0}.dshp-page .dshp-table td:last-child{flex:none}.dshp-embed{height:min(74vh,560px);min-height:380px}}
+
+/* 授权 / 欢迎窗 */
+.dshp-auth-mask{position:fixed;inset:0;z-index:10100;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:20px;pointer-events:auto}
+.dshp-env-gate{z-index:10200}
 body:not([data-ds-dark-theme]) .dshp-auth-modal{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fffcf7) 92%,transparent);color:var(--dsw-alias-label-primary,#1a1916);border-color:color-mix(in srgb,var(--dsw-alias-border-l1,#c9c3b6) 80%,transparent);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3)}
 body:not([data-ds-dark-theme]) .dshp-auth-legal{background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#f3f0e8) 90%,transparent);color:var(--dsw-alias-label-primary,#1a1916);border-color:color-mix(in srgb,var(--dsw-alias-border-l1,#c9c3b6) 80%,transparent)}
 body:not([data-ds-dark-theme]) .dshp-auth-warn{background:color-mix(in srgb,#f5e6c8 88%,transparent);color:#6b4a10}
 body:not([data-ds-dark-theme]) .dshp-auth-ops button{border-color:var(--dsw-alias-border-l1,#c9c3b6);color:var(--dsw-alias-label-primary,#1a1916);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fff) 88%,transparent)}
 body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--dsw-alias-brand-primary,#3f6b52);border-color:var(--dsw-alias-brand-primary,#3f6b52);color:#fff}
-.dshp-dock-resize,.dshp-dock-resize-l,.dshp-dock-resize-r,.dshp-dock-resize-b{position:absolute;z-index:60;pointer-events:auto;touch-action:none}
-.dshp-dock-resize{right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 46%,color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 75%,transparent) 46%);border-radius:0 0 12px 0;opacity:.95}
-.dshp-dock-resize-l{left:-2px;top:0;bottom:0;width:10px;cursor:ew-resize;background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent)}
-.dshp-dock-resize-l:hover,.dshp-dock-resize-r:hover{background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 42%,transparent)}
-.dshp-dock-resize-r{right:-2px;top:0;bottom:22px;width:10px;cursor:ew-resize;background:transparent}
-.dshp-dock-resize-b{left:10px;right:22px;bottom:-2px;height:10px;cursor:ns-resize;background:transparent}
-.dshp-dock-resize-b:hover{background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 35%,transparent)}
-.dshp-auth-mask{position:fixed;inset:0;z-index:10100;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:20px;pointer-events:auto}
-.dshp-env-gate{z-index:10200}
 .dshp-auth-modal{width:min(680px,100%);max-height:min(88vh,820px);display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--dsw-alias-border-l1,#333);border-radius:12px;background:var(--dsw-alias-bg-layer-1,#1a1a1a);color:var(--dsw-alias-label-primary,#eee)}
 .dshp-auth-modal h2{margin:0;font-size:16px;font-weight:600}
 .dshp-auth-warn{padding:8px 10px;border-radius:8px;background:#3a2e18;color:#f0d48a;font-size:13px}
@@ -917,46 +905,10 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 .dshp-auth-checks label{display:flex;gap:8px;align-items:flex-start}
 .dshp-auth-checks label.locked{opacity:.45}
 .dshp-auth-ops{display:flex;justify-content:flex-end;gap:8px}
-.dshp-auth-ops button,.dshp-dock-head button{appearance:none;border:1px solid var(--dsw-alias-border-l1,#444);background:transparent;color:inherit;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit}
+.dshp-auth-ops button{appearance:none;border:1px solid var(--dsw-alias-border-l1,#444);background:transparent;color:inherit;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit}
 .dshp-auth-ops button.primary{background:#2a4033;border-color:#8fbf9a}
 .dshp-auth-ops button:disabled{opacity:.45;cursor:default}
-.dshp-icon-btn{appearance:none;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 45%,transparent);border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary,currentColor);cursor:pointer;font:13px/1 inherit;white-space:nowrap;flex:0 0 auto}
-.dshp-icon-btn:hover{border-color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 12%,transparent);color:var(--dsw-alias-label-primary,currentColor)}
-.dshp-icon-btn.on{border-color:var(--dsw-alias-brand-primary,#6dbf8c);color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 16%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 28%,transparent)}
-.dshp-hbtn{appearance:none;display:inline-flex;flex:0 0 auto;align-items:center;gap:6px;border:1px solid color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 55%,transparent);background:transparent;color:var(--dsw-alias-label-secondary,currentColor);cursor:pointer;font:12px/1 inherit;padding:5px 10px;border-radius:8px;white-space:nowrap}
-.dshp-hbtn:hover{border-color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 12%,transparent);color:var(--dsw-alias-label-primary,currentColor)}
-.dshp-hbtn.on{border-color:var(--dsw-alias-brand-primary,#6dbf8c);color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 32%,transparent)}
-.dshp-live-dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--dsw-alias-brand-primary,#6dbf8c);box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 28%,transparent)}
-.dshp-hero-chip{display:inline-flex;align-items:center;margin-left:6px;flex:0 0 auto}
-.dshp-hero-chip-btn{appearance:none;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border:1px solid color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 50%,transparent);border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 10%,transparent);color:var(--dsw-alias-label-primary,currentColor);cursor:pointer;font:12.5px/1 inherit;white-space:nowrap}
-.dshp-hero-chip-btn:hover{border-color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent)}
-.dshp-hero-chip-btn.on{border-color:var(--dsw-alias-brand-primary,#6dbf8c);color:var(--dsw-alias-brand-primary,#6dbf8c);background:color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 18%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--dsw-alias-brand-primary,#6dbf8c) 32%,transparent)}
-.dshp-tab-chip{display:inline-flex;align-items:flex-end;flex:0 0 auto}
-.dshp-tab-btn{appearance:none;position:relative;border:none;background:transparent;cursor:pointer;padding:0 0 9px;font:500 13px/16px inherit;color:var(--dsw-alias-label-tertiary,currentColor);white-space:nowrap}
-.dshp-tab-btn:hover{color:var(--dsw-alias-label-primary,currentColor)}
-.dshp-tab-btn.on{color:var(--dsw-alias-brand-primary,#6dbf8c)}
-.dshp-tab-btn.on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:var(--dsw-alias-brand-primary,#6dbf8c)}
-/* 玻璃跟随宿主颜色。字重和底的不透明度分开：壳透，字坐在更实的一层上。 */
-.dshp-dock{font-family:"Segoe UI","Microsoft YaHei UI","PingFang SC","Noto Sans SC",system-ui,sans-serif;font-size:14px;line-height:1.6;font-weight:500;-webkit-font-smoothing:antialiased;text-shadow:none}
-.dshp-dock[data-theme="white"],.dshp-dock[data-theme="dusk"]{background:linear-gradient(165deg,color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fff) 50%,transparent),color-mix(in srgb,var(--dsw-alias-brand-primary,#6d8f78) 18%,transparent) 46%,color-mix(in srgb,var(--dsw-alias-bg-layer-2,#fff) 28%,transparent))!important;backdrop-filter:blur(26px) saturate(1.45)!important;-webkit-backdrop-filter:blur(26px) saturate(1.45)!important;color:var(--dshp-ink)!important;border:1px solid color-mix(in srgb,var(--dsw-alias-brand-primary,#6d8f78) 36%,transparent)!important;box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 42%,transparent),0 18px 44px color-mix(in srgb,#000 18%,transparent)!important}
-.dshp-dock[data-theme="dusk"]{--dshp-ink:var(--dsw-alias-label-primary,#f4f1ea);--dshp-mute:color-mix(in srgb,var(--dsw-alias-label-primary,#f4f1ea) 84%,var(--dsw-alias-label-secondary,#c9c3b8))}
-.dshp-dock[data-theme="white"]{--dshp-ink:var(--dsw-alias-label-primary,#16140f);--dshp-mute:color-mix(in srgb,var(--dsw-alias-label-primary,#16140f) 76%,var(--dsw-alias-label-secondary,#3c362e))}
-.dshp-dock .dshp-dock-head,.dshp-dock .dshp-dock-tabs{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,transparent) 28%,transparent)!important;color:var(--dshp-ink)!important}
-.dshp-dock .dshp-dock-head,.dshp-dock .dshp-dock-head b,.dshp-dock .dshp-dock-head button,.dshp-dock .dshp-dock-tab,.dshp-dock .dshp-dock-tab.on{color:var(--dshp-ink)!important;text-shadow:none!important;font-weight:600}
-.dshp-dock .dshp-dock-tab{font-size:14px}
-.dshp-dock .dshp-dock-tab.on{border-bottom-color:var(--dsw-alias-brand-primary,#6d8f78)!important}
-.dshp-dock-body .rt-dock{font-size:14px!important;line-height:1.6!important;font-weight:500!important;color:var(--dshp-ink)!important;--rt-ink:var(--dshp-ink);--rt-mute:var(--dshp-mute);--rt-surf:color-mix(in srgb,var(--dsw-alias-bg-layer-2,var(--dsw-alias-bg-layer-1,#fff)) 40%,transparent);--rt-surf-2:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fff) 62%,transparent);--rt-line:color-mix(in srgb,var(--dsw-alias-brand-primary,#6d8f78) 30%,transparent)}
-.dshp-dock-body .rt-title,.dshp-dock-body .rt-tab,.dshp-dock-body .rt-tab.on,.dshp-dock-body .rt-card,.dshp-dock-body .rt-card h4,.dshp-dock-body .rt-row,.dshp-dock-body .rt-vrow,.dshp-dock-body .rt-kv,.dshp-dock-body .rt-kv b,.dshp-dock-body .rt-kv span,.dshp-dock-body .rt-mono,.dshp-dock-body .rt-empty,.dshp-dock-body .rt-foot,.dshp-dock-body .rt-tag,.dshp-dock-body .rt-item,.dshp-dock-body .rt-item-name,.dshp-dock-body .rt-item-desc,.dshp-dock-body .rt-sec-sub,.dshp-dock-body .rt-kb-sub,.dshp-dock-body .rt-seg-cidr,.dshp-dock-body .rt-seg-meta,.dshp-dock-body .rt-section,.dshp-dock-body .rt-note,.dshp-dock-body .rt-hint{color:var(--dshp-ink)!important;text-shadow:none!important;opacity:1!important}
-.dshp-dock-body .rt-tab,.dshp-dock-body .rt-foot,.dshp-dock-body .rt-empty,.dshp-dock-body .rt-item-desc,.dshp-dock-body .rt-kb-sub,.dshp-dock-body .rt-kv span,.dshp-dock-body .rt-tag,.dshp-dock-body .rt-sec-sub{color:var(--dshp-mute)!important}
-.dshp-dock-body .rt-card,.dshp-dock-body .rt-pane,.dshp-dock-body .rt-side,.dshp-dock-body .rt-table,.dshp-dock-body .rt-toolbar,.dshp-dock-body .rt-embedded>.rt-head,.dshp-dock-body .rt-tabs{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fff) 72%,transparent)!important;border-color:color-mix(in srgb,var(--dsw-alias-brand-primary,#6d8f78) 28%,transparent)!important;color:var(--dshp-ink)!important;box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 26%,transparent)!important;backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3)}
-.dshp-dock-body .rt-btn,.dshp-dock-body .rt-input,.dshp-dock-body .rt-eng-select,.dshp-dock-body textarea.rt-input{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fff) 90%,transparent)!important;color:var(--dshp-ink)!important;border-color:color-mix(in srgb,var(--dsw-alias-border-l1,#888) 70%,transparent)!important}
-.dshp-dock-body .rt-btn-primary{background:var(--dsw-alias-brand-primary,#3f6b52)!important;border-color:var(--dsw-alias-brand-primary,#3f6b52)!important;color:#fff!important}
-.dshp-dock[data-theme="white"] .dshp-dock-body .rt-eng-select option,.dshp-dock[data-theme="white"] .dshp-dock-body .rt-input option{background:#fff;color:#16140f}
-.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-eng-select option,.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-input option{background:#1b1d22;color:#f4f1ea}
-.dshp-dock-body .rt-err{font-weight:650}
-.dshp-dock[data-theme="white"] .dshp-dock-body .rt-err{color:#9a3434!important}
-.dshp-dock[data-theme="dusk"] .dshp-dock-body .rt-err{color:#f0b4b4!important}
-.dshp-dock-body .rt-rep-http,.dshp-dock-body pre{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fff) 84%,transparent)!important;color:var(--dshp-ink)!important;border:1px solid color-mix(in srgb,var(--dsw-alias-border-l1,#888) 60%,transparent)!important}
+
 `;
 
 		function formatSize(bytes) {
@@ -2424,8 +2376,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			return detectHostTheme();
 		}
 
-		function SettingsRoot(props) {
-			const t = typeof props.t === "function" ? props.t : ((key) => key);
+		function useHostTheme() {
 			const [theme, setTheme] = useState(readTheme);
 			useEffect(() => {
 				let cancelled = false;
@@ -2456,13 +2407,159 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					try { obs?.disconnect(); } catch { /* ignore */ }
 				};
 			}, []);
+			return theme;
+		}
+
+		const PAGE_SEGMENTS = [
+			{ id: "armor", key: "page.seg.armor" },
+			{ id: "rules", key: "page.seg.rules" },
+			{ id: "skills", key: "page.seg.skills" },
+			{ id: "drill", key: "page.seg.drill" },
+		];
+
+		function SettingsPage(props) {
+			const t = typeof props.t === "function" ? props.t : translate;
+			const [seg, setSeg] = useState("armor");
+			const theme = useHostTheme();
 			translate = t;
-			return h("div", { className: "dshp-root", "data-theme": theme },
+			return h("div", { className: "dshp-root dshp-page", "data-theme": theme, "data-seg": seg },
 				h("style", null, PURGE_CSS),
-				h(PurgifySection, null),
-				h(RulesSection, null),
-				h(SkillsSection, null),
+				h("div", { className: "dshp-page-head" },
+					h("div", { className: "dshp-page-text" },
+						h("h2", { className: "dshp-title" }, t("page.title")),
+						h("p", { className: "dshp-page-lead" }, t("page.lead")),
+					),
+					h("div", { className: "dshp-segbar", role: "tablist", "aria-label": t("page.title") },
+						PAGE_SEGMENTS.map((item) => h("button", {
+							key: item.id,
+							type: "button",
+							role: "tab",
+							"aria-selected": seg === item.id ? "true" : "false",
+							className: "dshp-seg" + (seg === item.id ? " on" : ""),
+							onClick: () => setSeg(item.id),
+						}, t(item.key))),
+					),
+				),
+				seg === "armor" ? h(PurgifySection, null) : null,
+				seg === "rules" ? h(RulesSection, null) : null,
+				seg === "skills" ? h(SkillsSection, null) : null,
+				seg === "drill" ? h(DrillSection, { t: t }) : null,
 			);
+		}
+
+		/* 演练台放在设置页第四段。未授权时只显示一张授权卡片，不往会话界面塞浮窗。 */
+		function DrillSection(props) {
+			const t = typeof props.t === "function" ? props.t : translate;
+			const [granted, setGranted] = useState(() => readDrillAuth());
+			useEffect(() => {
+				if (granted) return undefined;
+				const timer = window.setInterval(() => {
+					if (readDrillAuth()) setGranted(true);
+				}, 800);
+				return () => window.clearInterval(timer);
+			}, [granted]);
+			if (!granted) {
+				return h("section", { className: "dshp-panel", "aria-label": t("page.seg.drill") },
+					h("div", { className: "dshp-head" },
+						h("div", { className: "dshp-page-text" },
+							h("h3", { className: "dshp-title" }, t("page.seg.drill")),
+							h("p", { className: "dshp-page-lead" }, t("page.drill.lead")),
+						),
+					),
+					h("div", { className: "dshp-row" },
+						h(Btn, { kind: "primary", onClick: () => requestDrillAuth() }, t("page.drill.authorize")),
+					),
+				);
+			}
+			const Panel = __dshPurgeDrill && __dshPurgeDrill.Panel;
+			if (!Panel) {
+				return h("section", { className: "dshp-panel" },
+					h("p", { className: "dshp-page-lead" }, t("page.drill.unavailable")),
+				);
+			}
+			return h("div", { className: "dshp-embed" }, h(Panel, { embedded: true }));
+		}
+
+		/* settings.section 只投影 id / order / label，没有 icon 字段。
+		 * 按 label 认出自己那一行，用 mask 图标替换外壳按 id 生成的齿轮。 */
+		const NAV_ICON_MARKER = "data-dsh-purge-nav-icon";
+		const NAV_ICON_SVG =
+			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round">' +
+			'<path d="M4 7h9M19 7h1M4 17h3M13 17h7"/>' +
+			'<circle cx="16" cy="7" r="2.1"/><circle cx="9" cy="17" r="2.1"/>' +
+			"</svg>";
+		const NAV_ICON_MASK_URL = "url(\"data:image/svg+xml;utf8," + encodeURIComponent(NAV_ICON_SVG) + "\")";
+		const NAV_ROW_SELECTOR = "[role=\"dialog\"] nav button";
+
+		function installSettingsNavIcon(ctx, resolveLabel) {
+			if (typeof document === "undefined" || !ctx || typeof ctx.effect !== "function") return;
+			ctx.effect(() => {
+				const tag = document.createElement("style");
+				tag.dataset.plugin = "dsh-purge";
+				tag.dataset.pluginCss = "dsh-purge/settings-nav-icon";
+				tag.textContent = [
+					"[" + NAV_ICON_MARKER + "] > svg { display: none; }",
+					"[" + NAV_ICON_MARKER + "]::before {",
+					"  content: '';",
+					"  flex: none;",
+					"  width: 16px;",
+					"  height: 16px;",
+					"  background-color: currentColor;",
+					"  -webkit-mask-image: " + NAV_ICON_MASK_URL + ";",
+					"  mask-image: " + NAV_ICON_MASK_URL + ";",
+					"  -webkit-mask-repeat: no-repeat;",
+					"  mask-repeat: no-repeat;",
+					"  -webkit-mask-position: center;",
+					"  mask-position: center;",
+					"  -webkit-mask-size: 16px 16px;",
+					"  mask-size: 16px 16px;",
+					"}",
+				].join("\n");
+				document.head.appendChild(tag);
+				let disposed = false;
+				let scheduled = false;
+				let warned = false;
+				const sync = () => {
+					scheduled = false;
+					if (disposed) return;
+					const wanted = String(resolveLabel() || "").trim();
+					if (!wanted) return;
+					const rows = document.querySelectorAll(NAV_ROW_SELECTOR);
+					let hit = null;
+					for (const row of rows) {
+						if (String(row.textContent || "").trim() === wanted) { hit = row; break; }
+					}
+					if (!hit) {
+						if (rows.length > 0 && !warned) {
+							warned = true;
+							try { console.warn("[dsh-purge] settings nav row not found; section registration may have failed"); } catch { /* ignore */ }
+						}
+						return;
+					}
+					if (!hit.hasAttribute(NAV_ICON_MARKER)) hit.setAttribute(NAV_ICON_MARKER, "1");
+				};
+				const schedule = () => {
+					if (scheduled || disposed) return;
+					scheduled = true;
+					window.requestAnimationFrame(sync);
+				};
+				const observer = new MutationObserver(schedule);
+				observer.observe(document.body || document.documentElement, {
+					childList: true,
+					subtree: true,
+					attributes: true,
+					attributeFilter: ["class", "data-ds-dark-theme"],
+				});
+				schedule();
+				return () => {
+					disposed = true;
+					observer.disconnect();
+					tag.remove();
+					for (const row of document.querySelectorAll("[" + NAV_ICON_MARKER + "]")) {
+						row.removeAttribute(NAV_ICON_MARKER);
+					}
+				};
+			}, "dsh-purge: settings nav icon");
 		}
 
 		/* 回退已移除；这里仍保留只读宿主上下文，cwd、模式判断和发送门禁还要拿当前会话。 */
@@ -6754,14 +6851,12 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					if (!r || r.ok === false) throw new Error("grant");
 					if (r.granted) {
 						setDrillAuthLocal(true);
-						if (dockBus.authOpen) setDock({ authOpen: false });
+						if (gateBus.open) setGate({ open: false });
 						return;
 					}
 					if (drillGrantPosting > 0) return;
 					setDrillAuthLocal(false);
-					if (dockBus.authOpen || dockBus.tab === "drill") {
-						setDock({ open: true, tab: "drill", authOpen: true, pending: dockBus.pending || "tab" });
-					}
+					if (gateBus.open) setGate({ open: true, pending: gateBus.pending || "tab" });
 				})
 				.catch(() => {
 					if (gen !== drillGrantGen) return;
@@ -6774,87 +6869,49 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				});
 		}
 
-		let dockBus = { open: false, tab: "clean", authOpen: false, pending: "tab", listeners: new Set() };
-		function getDock() { return dockBus; }
-		function setDock(patch) {
-			dockBus = Object.assign({}, dockBus, patch);
-			dockBus.listeners.forEach((fn) => { try { fn(dockBus); } catch { /* ignore */ } });
+		/* 授权门是全局单例：设置页、环境门禁、发送拦截都从这里弹出同一扇窗。 */
+		let gateBus = { open: false, pending: "tab", listeners: new Set() };
+		function setGate(patch) {
+			gateBus = Object.assign({}, gateBus, patch);
+			gateBus.listeners.forEach((fn) => { try { fn(gateBus); } catch { /* ignore */ } });
 		}
-		function useDock() {
-			const [st, setSt] = useState(dockBus);
+		function useGate() {
+			const [st, setSt] = useState(gateBus);
 			useEffect(() => {
 				const fn = (next) => setSt(next);
-				dockBus.listeners.add(fn);
-				return () => { dockBus.listeners.delete(fn); };
+				gateBus.listeners.add(fn);
+				return () => { gateBus.listeners.delete(fn); };
 			}, []);
 			return st;
 		}
 
+		function openDrill(kind) {
+			try {
+				if (__dshPurgeDrill && __dshPurgeDrill.setUI) {
+					__dshPurgeDrill.setUI(kind === "env" ? { open: true, tab: "env" } : { open: true });
+				}
+			} catch { /* ignore */ }
+		}
+
 		function requestDrill(kind) {
 			const pending = kind || "tab";
-			const openEnv = () => {
-				try {
-					if (__dshPurgeDrill && __dshPurgeDrill.setUI) {
-						__dshPurgeDrill.setUI({ open: true, tab: "env" });
-					}
-				} catch { /* ignore */ }
-			};
 			if (readDrillAuth()) {
-				setDock({ open: true, tab: "drill", authOpen: false, pending: "tab" });
-				try { if (__dshPurgeDrill && __dshPurgeDrill.setUI) __dshPurgeDrill.setUI({ open: true }); } catch { /* ignore */ }
-				if (pending === "env") openEnv();
-				if (pending === "full") {
-					try { window.open(window.location.href.split("#")[0] + "#redteam-full", "_blank", "noopener"); } catch { /* ignore */ }
-				}
+				openDrill(pending);
 				return;
 			}
-			/* 未授权：直接切到演练台页签并弹出授权窗（不再停在清洗页，避免像「没触发」） */
-			setDock({ open: true, tab: "drill", authOpen: true, pending: pending });
+			setGate({ open: true, pending: pending });
+		}
+
+		/* 设置页里的演练台只需要授权，授权完由页面内嵌面板直接展开。 */
+		function requestDrillAuth() {
+			if (readDrillAuth()) return;
+			setGate({ open: true, pending: "page" });
 		}
 
 		function requestDrillEnv() {
 			requestDrill("env");
 		}
-
-		function openDockClean() {
-			setDock({ open: true, tab: "clean", authOpen: false, pending: "tab" });
-		}
-		function toggleDock() {
-			if (dockBus.open) setDock({ open: false, authOpen: false, pending: "tab" });
-			else openDockClean();
-		}
 		syncDrillGrant();
-
-		const DOCK_GEOM_KEY = "dsh-purge-dock-geom-v4";
-		/* 默认停在右上，底边留在输入框上面。拖动之后停在用户松开的位置，只保证不拖出窗口。 */
-		const DOCK_COMPOSER_CLEAR = 172;
-		function defaultDockGeom() {
-			const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
-			const vh = typeof window !== "undefined" ? window.innerHeight : 800;
-			const w = Math.min(620, Math.max(380, vw - 16));
-			const y = 48;
-			const h = Math.max(240, Math.min(640, vh - y - DOCK_COMPOSER_CLEAR));
-			return { x: Math.max(8, vw - w - 8), y: y, w: w, h: h };
-		}
-		function clampDockGeom(g) {
-			const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
-			const vh = typeof window !== "undefined" ? window.innerHeight : 800;
-			const w = Math.min(Math.max(380, Number(g && g.w) || 620), Math.max(380, vw - 16));
-			const h = Math.min(Math.max(240, Number(g && g.h) || 520), Math.max(240, vh - 16));
-			const x = Math.min(Math.max(8, Number(g && g.x) || 8), Math.max(8, vw - w - 8));
-			const y = Math.min(Math.max(8, Number(g && g.y) || 8), Math.max(8, vh - Math.min(h, vh - 16) - 8));
-			return { x: x, y: y, w: w, h: h };
-		}
-		function loadDockGeom() {
-			try {
-				const raw = JSON.parse(window.localStorage.getItem(DOCK_GEOM_KEY) || "null");
-				if (raw && typeof raw === "object") return clampDockGeom(raw);
-			} catch { /* ignore */ }
-			return clampDockGeom(defaultDockGeom());
-		}
-		function saveDockGeom(g) {
-			try { window.localStorage.setItem(DOCK_GEOM_KEY, JSON.stringify(clampDockGeom(g))); } catch { /* ignore */ }
-		}
 
 		function WelcomeNotice() {
 			const t = useT();
@@ -6951,8 +7008,8 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			};
 			const okLabel = !ready
 				? t("auth.ok")
-				: (props.pending === "full"
-					? t("auth.ok.full")
+				: (props.pending === "page"
+					? t("auth.ok.page")
 					: (props.pending === "env" ? t("auth.ok.env") : t("auth.ok.tab")));
 			return h("div", { className: "dshp-auth-mask", role: "dialog", "aria-modal": "true" },
 				h("div", { className: "dshp-auth-modal" },
@@ -6980,7 +7037,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 						),
 					),
 					h("div", { className: "dshp-auth-ops" },
-						h("button", { type: "button", onClick: () => setDock({ authOpen: false, tab: "clean", pending: "tab" }) }, t("auth.no")),
+						h("button", { type: "button", onClick: () => setGate({ open: false }) }, t("auth.no")),
 						h("button", {
 							type: "button",
 							className: "primary",
@@ -6989,14 +7046,8 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 								if (!ready) return;
 								writeDrillAuth(true);
 								const kind = props.pending || "tab";
-								setDock({ authOpen: false, open: true, tab: "drill", pending: "tab" });
-								try { if (__dshPurgeDrill && __dshPurgeDrill.setUI) __dshPurgeDrill.setUI({ open: true }); } catch { /* ignore */ }
-								if (kind === "env") {
-									try { if (__dshPurgeDrill && __dshPurgeDrill.setUI) __dshPurgeDrill.setUI({ open: true, tab: "env" }); } catch { /* ignore */ }
-								}
-								if (kind === "full") {
-									try { window.open(window.location.href.split("#")[0] + "#redteam-full", "_blank", "noopener"); } catch { /* ignore */ }
-								}
+								setGate({ open: false });
+								if (kind !== "page") openDrill(kind);
 							},
 						}, okLabel),
 					),
@@ -7120,7 +7171,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			if (!el || el.nodeType !== 1) return false;
 			const btn = el.closest("button, [role='button']");
 			if (!btn) return false;
-			if (btn.closest(".dshp-dock, .dshp-auth-mask, .rt-dock, .dshp-env-gate")) return false;
+			if (btn.closest(".dshp-auth-mask, .rt-dock, .dshp-env-gate")) return false;
 			const label = [
 				btn.getAttribute("aria-label"),
 				btn.getAttribute("title"),
@@ -7277,7 +7328,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					const inComposer = e.target && e.target.closest
 						&& e.target.closest("[data-composer-card], [data-composer-seat], [contenteditable='true'], textarea");
 					if (!inComposer) return;
-					if (e.target.closest && e.target.closest(".dshp-dock, .dshp-auth-mask, .rt-dock, .dshp-env-gate")) return;
+					if (e.target.closest && e.target.closest(".dshp-auth-mask, .rt-dock, .dshp-env-gate")) return;
 					if (!mustBlockSubmit()) return;
 					e.preventDefault();
 					e.stopPropagation();
@@ -7358,336 +7409,30 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			);
 		}
 
-		function PurgeDock() {
-			const t = useT();
-			const st = useDock();
-			const [geom, setGeom] = useState(() => loadDockGeom());
-			const [dockTheme, setDockTheme] = useState(detectHostTheme);
-			useEffect(() => {
-				const sync = () => setDockTheme(detectHostTheme());
-				sync();
-				const obs = new MutationObserver(sync);
-				if (document.body) obs.observe(document.body, { attributes: true, attributeFilter: ["data-ds-dark-theme", "class", "style"] });
-				obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-ds-dark-theme", "class", "style"] });
-				const timer = window.setInterval(sync, 1500);
-				return () => { obs.disconnect(); window.clearInterval(timer); };
-			}, []);
-			useEffect(() => {
-				let uiTag = document.querySelector('style[data-dsh-purge-ui="1"]');
-				if (!uiTag) {
-					uiTag = document.createElement("style");
-					uiTag.setAttribute("data-dsh-purge-ui", "1");
-					uiTag.textContent = PURGE_CSS;
-					document.head.append(uiTag);
-				}
-				if (!__dshPurgeDrill || !__dshPurgeDrill.CSS) return undefined;
-				const styleTag = document.createElement("style");
-				styleTag.setAttribute("data-dsh-purge-drill", "1");
-				styleTag.textContent = __dshPurgeDrill.CSS;
-				document.head.append(styleTag);
-				const widthTag = document.createElement("style");
-				widthTag.setAttribute("data-dsh-purge-dock-w", "1");
-				widthTag.textContent = ":root{--dshp-dock-w:" + geom.w + "px;--dshp-dock-h:" + geom.h + "px}";
-				document.head.append(widthTag);
-				return () => { styleTag.remove(); widthTag.remove(); };
-			}, []);
-			useEffect(() => {
-				saveDockGeom(geom);
-				const tag = document.querySelector('style[data-dsh-purge-dock-w="1"]');
-				if (tag) tag.textContent = ":root{--dshp-dock-w:" + geom.w + "px;--dshp-dock-h:" + geom.h + "px}";
-			}, [geom]);
-			useEffect(() => {
-				const onResize = () => setGeom((g) => clampDockGeom(g));
-				window.addEventListener("resize", onResize);
-				return () => window.removeEventListener("resize", onResize);
-			}, []);
-			useEffect(() => {
-				if (st.tab === "drill" && readDrillAuth() && __dshPurgeDrill && __dshPurgeDrill.setUI) {
-					try { __dshPurgeDrill.setUI({ open: true }); } catch { /* ignore */ }
-				}
-			}, [st.tab, st.open]);
-			const onTab = (id) => {
-				if (id === "drill") { requestDrill("tab"); return; }
-				setDock({ tab: "clean", authOpen: false, pending: "tab" });
-			};
-			const startDrag = (e) => {
-				if (e.button !== 0) return;
-				if (e.target && e.target.closest && e.target.closest("button,a,input,select,textarea,label")) return;
-				e.preventDefault();
-				const sx = e.clientX;
-				const sy = e.clientY;
-				const ox = geom.x;
-				const oy = geom.y;
-				const move = (ev) => setGeom((g) => clampDockGeom({ x: ox + (ev.clientX - sx), y: oy + (ev.clientY - sy), w: g.w, h: g.h }));
-				const up = () => {
-					window.removeEventListener("mousemove", move);
-					window.removeEventListener("mouseup", up);
-				};
-				window.addEventListener("mousemove", move);
-				window.addEventListener("mouseup", up);
-			};
-			const startResize = (e) => {
-				if (e.button !== 0) return;
-				e.preventDefault();
-				e.stopPropagation();
-				const sx = e.clientX;
-				const sy = e.clientY;
-				const ow = geom.w;
-				const oh = geom.h;
-				const move = (ev) => setGeom((g) => clampDockGeom({ x: g.x, y: g.y, w: ow + (ev.clientX - sx), h: oh + (ev.clientY - sy) }));
-				const up = () => {
-					window.removeEventListener("mousemove", move);
-					window.removeEventListener("mouseup", up);
-				};
-				window.addEventListener("mousemove", move);
-				window.addEventListener("mouseup", up);
-			};
-			const startResizeLeft = (e) => {
-				if (e.button !== 0) return;
-				e.preventDefault();
-				e.stopPropagation();
-				const sx = e.clientX;
-				const ox = geom.x;
-				const ow = geom.w;
-				const move = (ev) => {
-					const dx = ev.clientX - sx;
-					setGeom((g) => clampDockGeom({ x: ox + dx, y: g.y, w: ow - dx, h: g.h }));
-				};
-				const up = () => {
-					window.removeEventListener("mousemove", move);
-					window.removeEventListener("mouseup", up);
-				};
-				window.addEventListener("mousemove", move);
-				window.addEventListener("mouseup", up);
-			};
-			const startResizeRight = (e) => {
-				if (e.button !== 0) return;
-				e.preventDefault();
-				e.stopPropagation();
-				const sx = e.clientX;
-				const ow = geom.w;
-				const move = (ev) => setGeom((g) => clampDockGeom({ x: g.x, y: g.y, w: ow + (ev.clientX - sx), h: g.h }));
-				const up = () => {
-					window.removeEventListener("mousemove", move);
-					window.removeEventListener("mouseup", up);
-				};
-				window.addEventListener("mousemove", move);
-				window.addEventListener("mouseup", up);
-			};
-			const startResizeBottom = (e) => {
-				if (e.button !== 0) return;
-				e.preventDefault();
-				e.stopPropagation();
-				const sy = e.clientY;
-				const oh = geom.h;
-				const move = (ev) => setGeom((g) => clampDockGeom({ x: g.x, y: g.y, w: g.w, h: oh + (ev.clientY - sy) }));
-				const up = () => {
-					window.removeEventListener("mousemove", move);
-					window.removeEventListener("mouseup", up);
-				};
-				window.addEventListener("mousemove", move);
-				window.addEventListener("mouseup", up);
-			};
-			const body = st.tab === "clean"
-				? h(SettingsRoot, { t })
-				: (readDrillAuth() && __dshPurgeDrill.Panel
-					? h(__dshPurgeDrill.Panel, { embedded: true })
-					: h("div", { style: { padding: 16, color: "var(--dsw-alias-label-secondary)" } }, t("dock.unauthorized")));
-			const panel = h("div", {
-				className: "dshp-dock",
-				"data-theme": dockTheme === "white" ? "white" : "dusk",
-				"data-open": st.open ? "1" : "0",
-				style: {
-					left: geom.x + "px",
-					top: geom.y + "px",
-					right: "auto",
-					bottom: "auto",
-					width: geom.w + "px",
-					height: geom.h + "px",
-				},
-			},
-				h("div", { className: "dshp-dock-head", onMouseDown: startDrag, title: "按住拖动面板" },
-					h("b", null, "dsh-purge"),
-					h("span", { style: { flex: 1 } }),
-					st.tab === "drill" && readDrillAuth()
-						? h("button", { type: "button", onClick: () => requestDrill("full") }, t("dock.full"))
-						: null,
-					h("button", { type: "button", onClick: () => setDock({ open: false, authOpen: false, tab: "clean", pending: "tab" }) }, t("dock.close")),
-				),
-				h("div", { className: "dshp-dock-tabs", role: "tablist" },
-					h("button", {
-						type: "button",
-						className: "dshp-dock-tab" + (st.tab === "clean" ? " on" : ""),
-						role: "tab",
-						"aria-selected": st.tab === "clean" ? "true" : "false",
-						onClick: () => onTab("clean"),
-					}, t("dock.clean")),
-					h("button", {
-						type: "button",
-						className: "dshp-dock-tab" + (st.tab === "drill" ? " on" : ""),
-						role: "tab",
-						"aria-selected": st.tab === "drill" ? "true" : "false",
-						onClick: () => onTab("drill"),
-					}, t("dock.drill") + (readDrillAuth() ? "" : " · " + t("dock.unauthorized"))),
-				),
-				h("div", { className: "dshp-dock-body" }, body),
-				h("div", { className: "dshp-dock-resize-l", title: "拖动调整宽度", onMouseDown: startResizeLeft }),
-				h("div", { className: "dshp-dock-resize-r", title: "拖动调整宽度", onMouseDown: startResizeRight }),
-				h("div", { className: "dshp-dock-resize-b", title: "拖动调整高度", onMouseDown: startResizeBottom }),
-				h("div", { className: "dshp-dock-resize", title: "拖动调整大小", onMouseDown: startResize }),
-			);
-			let portal = null;
-			let authPortal = null;
-			const authNode = st.authOpen ? h(AuthGate, { pending: st.pending }) : null;
-			try {
-				const rd = require("react-dom");
-				if (rd && typeof rd.createPortal === "function" && typeof document !== "undefined" && document.body) {
-					portal = rd.createPortal(panel, document.body);
-					if (authNode) authPortal = rd.createPortal(authNode, document.body);
-				}
-			} catch { /* host 可能没暴露 react-dom */ }
-			return h(react.Fragment, null,
-				portal || panel,
-				authPortal || authNode,
-			);
+		/* 授权窗和演练台资源常驻 shell.overlay，不依赖任何面板是否打开。 */
+		function AuthGateHost() {
+			const gate = useGate();
+			return gate.open ? h(AuthGate, { pending: gate.pending }) : null;
 		}
 
-		function PurgeLauncher() {
-			const t = useT();
-			const st = useDock();
-			return h("button", {
-				type: "button",
-				className: "dshp-launch",
-				"data-open": st.open ? "1" : "0",
-				"data-testid": "dsh-purge-launch",
-				title: t("dock.newSession"),
-				onClick: () => toggleDock(),
-			}, t("dock.newSession"));
-		}
-
-		/** 首页：模式旁挂「dsh-purge」→ 打开插件。红队模式走模式下拉（registry 声明）。 */
-		function HeroNewSessionMount() {
-			const t = useT();
-			const st = useDock();
-			const [host, setHost] = useState(null);
+		/* 页面、授权窗、内嵌演练台共用一份全局样式。 */
+		function PurgeRuntime() {
 			useEffect(() => {
-				let dead = false;
-				let warnedMiss = false;
-				const ensure = () => {
-					if (dead || typeof document === "undefined") return;
-					/* 多路挂点兜底:语义化 data-* 优先,class 子串模糊匹配兜底(不绑定具体 CSS Module 哈希) */
-					const row =
-						document.querySelector('[data-dsh-hero-workspace-row]') ||
-						document.querySelector('[data-conversation-hero]') ||
-						document.querySelector('[class*="heroWorkspaceRow" i]') ||
-						document.querySelector('[class*="hero" i][class*="workspace" i][class*="row" i]');
-					if (!row) {
-						if (!warnedMiss) {
-							warnedMiss = true;
-							try { console.warn("[dsh-purge] HeroNewSessionMount: anchor row missing (host 可能改版)"); } catch { /* ignore */ }
-						}
-						setHost((prev) => (prev ? null : prev));
-						return;
-					}
-					warnedMiss = false;
-					let el = row.querySelector(":scope > .dshp-hero-chip");
-					if (!el) {
-						el = document.createElement("div");
-						el.className = "dshp-hero-chip";
-						el.setAttribute("data-testid", "dsh-purge-hero-chip");
-						row.appendChild(el);
-					}
-					setHost((prev) => (prev === el ? prev : el));
+				const tags = [];
+				const add = (attr, css) => {
+					if (!css) return;
+					const tag = document.createElement("style");
+					tag.setAttribute(attr, "1");
+					tag.textContent = css;
+					document.head.append(tag);
+					tags.push(tag);
 				};
-				ensure();
-				const obs = typeof MutationObserver !== "undefined"
-					? new MutationObserver(() => ensure())
-					: null;
-				if (obs) obs.observe(document.body, { childList: true, subtree: true });
-				const iv = setInterval(ensure, 1000);
-				return () => {
-					dead = true;
-					if (obs) obs.disconnect();
-					clearInterval(iv);
-				};
+				add("data-dsh-purge-ui", PURGE_CSS);
+				if (__dshPurgeDrill && __dshPurgeDrill.CSS) add("data-dsh-purge-drill", __dshPurgeDrill.CSS);
+				return () => { tags.forEach((tag) => tag.remove()); };
 			}, []);
-			if (!host) return null;
-			const btn = h("button", {
-				type: "button",
-				className: "dshp-hero-chip-btn" + (st.open ? " on" : ""),
-				title: t("dock.newSession"),
-				onClick: () => toggleDock(),
-			},
-				st.open ? h("span", { className: "dshp-live-dot", "aria-hidden": "true" }) : null,
-				t("dock.newSession"),
-			);
-			try {
-				const rd = require("react-dom");
-				if (rd && typeof rd.createPortal === "function") return rd.createPortal(btn, host);
-			} catch { /* host 可能没暴露 react-dom */ }
 			return null;
 		}
-
-		/** 挂在「对话 / 轨迹 / 上下文」这一排，紧挨上下文。 */
-		function TabRowPurgeMount() {
-			const t = useT();
-			const st = useDock();
-			const [host, setHost] = useState(null);
-			useEffect(() => {
-				let dead = false;
-				let warnedMiss = false;
-				const ensure = () => {
-					if (dead || typeof document === "undefined") return;
-					/* 多路挂点兜底:data-* 优先,ARIA / class 子串兜底 */
-					const row =
-						document.querySelector("[data-conversation-tabs]") ||
-						document.querySelector("[data-conversation-tabrow]") ||
-						document.querySelector("[role='tablist'][aria-label*='对话' i]") ||
-						document.querySelector("[class*='conversation' i][class*='tab' i][class*='row' i]");
-					if (!row) {
-						if (!warnedMiss) {
-							warnedMiss = true;
-							try { console.warn("[dsh-purge] TabRowPurgeMount: tab row anchor missing"); } catch { /* ignore */ }
-						}
-						setHost((prev) => (prev ? null : prev));
-						return;
-					}
-					warnedMiss = false;
-					let el = row.querySelector(":scope > .dshp-tab-chip");
-					if (!el) {
-						el = document.createElement("div");
-						el.className = "dshp-tab-chip";
-						el.setAttribute("data-testid", "dsh-purge-tab-chip");
-						row.appendChild(el);
-					}
-					setHost((prev) => (prev === el ? prev : el));
-				};
-				ensure();
-				const obs = typeof MutationObserver !== "undefined"
-					? new MutationObserver(() => ensure())
-					: null;
-				if (obs) obs.observe(document.body, { childList: true, subtree: true });
-				const iv = setInterval(ensure, 1000);
-				return () => {
-					dead = true;
-					if (obs) obs.disconnect();
-					clearInterval(iv);
-				};
-			}, []);
-			if (!host) return null;
-			const btn = h("button", {
-				type: "button",
-				className: "dshp-tab-btn" + (st.open ? " on" : ""),
-				title: st.open ? (t("dock.inSession") + " · 已开启") : (t("dock.inSession") + " · 点击打开"),
-				onClick: () => toggleDock(),
-			}, t("dock.inSession"));
-			try {
-				const rd = require("react-dom");
-				if (rd && typeof rd.createPortal === "function") return rd.createPortal(btn, host);
-			} catch { /* host 可能没暴露 react-dom */ }
-			return null;
-		}
-
 
 		function installHostContext(ctx) {
 			hostCtx = ctx;
@@ -7751,11 +7496,20 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			ctx.effect(() => ctx.locale.register(NS, { zh, en }), "dsh-purge: dictionaries");
 			const t = ctx.locale.bind(NS);
 			translate = t;
+			ctx.slots.inject("settings.section", () => ctx.slots.register({
+				name: "settings.section",
+				id: "dsh-purge",
+				order: 450,
+				label: () => t("page.nav"),
+				locale: NS,
+				inject: () => ({ t }),
+			}, SettingsPage));
+			installSettingsNavIcon(ctx, () => t("page.nav"));
 			ctx.slots.inject("shell.overlay", () => ctx.slots.register({
 				name: "shell.overlay",
-				id: "dsh-purge-dock",
+				id: "dsh-purge-runtime",
 				order: 50,
-			}, () => h(react.Fragment, null, h(WelcomeNotice), h(PurgeLauncher), h(PurgeDock), h(HeroNewSessionMount), h(TabRowPurgeMount), h(EnvAdaptSendGate))));
+			}, () => h(react.Fragment, null, h(PurgeRuntime), h(WelcomeNotice), h(AuthGateHost), h(EnvAdaptSendGate))));
 			try {
 				if (typeof ctx.inject === "function") {
 					ctx.inject(["sessions", "uiWorkspace", "conversation"], (host) => {

@@ -137,5 +137,21 @@ console.log("\n== 6. prompt kernel v3 ==");
   }
 }
 
+console.log("\n== 7. settings page UI ==");
+{
+  const client = fs.readFileSync(path.join(pluginDir, "client.js"), "utf8");
+  check("settings section registered", client.includes('ctx.slots.inject("settings.section"'));
+  check("settings page is the section component", client.includes("}, SettingsPage));"));
+  check("settings nav icon installed", client.includes("installSettingsNavIcon(ctx"));
+  check("four page segments", ["page.seg.armor", "page.seg.rules", "page.seg.skills", "page.seg.drill"].every((key) => client.includes(`"${key}"`)));
+  check("drill embedded in page", client.includes('className: "dshp-embed"'));
+  check("conversation dock removed", !["function PurgeDock(", "function PurgeLauncher(", "function HeroNewSessionMount(", "function TabRowPurgeMount("].some((name) => client.includes(name)));
+  check("dock geometry removed", !client.includes("dsh-purge-dock-geom"));
+  check("legacy dock entries gone", !client.includes("dock.newSession") && !client.includes("dock.inSession"));
+  check("global auth gate host kept", client.includes("function AuthGateHost("));
+  check("page and embed styles present", client.includes(".dshp-page{") && client.includes(".dshp-embed{"));
+  check("page has narrow-screen layout", client.includes("@media (max-width:640px){.dshp-page-head"));
+}
+
 console.log(`\n${fail === 0 ? "ALL PASS" : `${fail} FAILED`}  (${pass} passed)`);
 process.exit(fail === 0 ? 0 : 1);
