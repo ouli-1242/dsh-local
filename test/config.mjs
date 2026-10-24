@@ -99,5 +99,16 @@ console.log("\n== 4. steer wake latch anchors ==");
   check("markers present", p90.markers.every((m) => result.text.includes(m)));
 }
 
+console.log("\n== 5. rewind removed ==");
+{
+  const ids = new Set(core.ALL_PATCHES.map((p) => p.id));
+  check("rewind patches removed", ![56, 75, 77].some((id) => ids.has(id)));
+  check("legacy rewind marker filter kept", ids.has(58));
+  const client = fs.readFileSync(path.join(pluginDir, "client.js"), "utf8");
+  check("no rewind endpoint in client", !client.includes("/dsh-purge/rewind"));
+  check("no rewind input slot", !client.includes("conversation.input.right"));
+  check("rewind module removed", !fs.existsSync(path.join(pluginDir, "lib", "rewind.js")));
+}
+
 console.log(`\n${fail === 0 ? "ALL PASS" : `${fail} FAILED`}  (${pass} passed)`);
 process.exit(fail === 0 ? 0 : 1);
