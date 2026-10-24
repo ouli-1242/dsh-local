@@ -1,3 +1,21 @@
+# 1.1.72
+
+## 中文
+
+- 版本 **1.1.72**：在 1.1.71 完全版基础上适配 DSH **0.2.1-rc.2**，保留技能库、知识库、自己的服务器白名单与 MIT。
+- 兼容：`{{cwd}}` 静态回退、#40 `requiredContexts`、#85/#86 Ctrl+Enter steer、`toolFilter` 清理与 schema `additionalProperties`、`dsh-tools` 解析、hostFs fd 直通、桌面换包不自杀、`file:` 归档更新。
+- 新增 `/purge` 输入节点，0.2.1 空会话也能看到命令结果。
+- 移除插件自更新入口：不再联网检查版本，也不再覆盖插件文件；升级请手动替换目录。
+- README 改为中文精简版，只保留安装、应用、命令行、还原与许可说明。
+
+## English
+
+- **1.1.72**: DSH **0.2.1-rc.2** compatibility on top of the full 1.1.71 build. Skills, the knowledge base, the own-server allowlist, and MIT stay.
+- Compatibility: static `{{cwd}}` fallback, patch #40 `requiredContexts`, #85/#86 Ctrl+Enter steer, `toolFilter` cleanup and schema `additionalProperties`, `dsh-tools` resolution, hostFs fd pass-through, desktop helper self-kill fix, `file:` archive update.
+- `/purge` now has an input node so its result is visible in a fresh 0.2.1 session.
+- Removed the plugin self-update entry: no network version checks and no overwriting plugin files. Upgrade by replacing the directory manually.
+- README is now a concise Chinese-only document covering install, apply, CLI, restore, and license.
+
 # 1.1.71
 
 ## 中文

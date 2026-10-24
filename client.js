@@ -8,7 +8,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		const { useState, useEffect, useCallback, useRef, Component } = react;
 
 		const name = "dsh-purge";
-		const inject = ["slots", "locale"];
+		const inject = ["slots", "locale", "uiConversation"];
 		const NS = "settings.dsh-purge";
 		let translate = (key) => key;
 		function useT() {
@@ -43,7 +43,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		function apiTimeoutMs(p, init) {
 			const path = String(p || "");
 			const method = String((init && init.method) || "GET").toUpperCase();
-			if (path.indexOf("/dsh-purge/update") !== -1) return method === "POST" ? 180000 : 45000;
 			if (path.indexOf("/dsh-purge/uninstall") !== -1) return 90000;
 			if (path.indexOf("/dsh-purge/skill") !== -1) return method === "POST" ? 120000 : 20000;
 			// status 会在"应用"期间被后端的同步落盘阻塞，默认 20s 必然被 abort，界面只会显示"读取失败: timeout"。
@@ -132,17 +131,17 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"dock.toggle": "dsh-purge",
 			"dock.newSession": "dsh-purge",
 			"dock.inSession": "dsh-purge",
-			"dock.redteam": "红队模式",
+			"dock.redteam": "演练台",
 			"dock.full": "全面浏览",
 			"dock.close": "收起",
 			"dock.unauthorized": "未授权",
 			"welcome.title": "用户须知",
 			"welcome.lead": "首次安装本插件时请阅读以下说明。确认后本窗不再弹出。",
-			"welcome.warn": "本插件免费开源。任何背着作者私自售卖、付费倒卖或借本项目盈利的行为，作者将依法追究法律责任。",
-			"welcome.body": "dsh-purge 是 DeepSeek Harness 的本机网络安全红队评测与清洗插件：在受控本机环境中调整提示词与补丁、做授权范围内的演练台操作。项目免费、非营利，源码仓库：",
-			"welcome.repo": "https://github.com/YuJunZhiXue/dsh-purge",
+			"welcome.warn": "本插件按 MIT 许可证提供。请只在有权管理的机器或已获授权的环境中使用。",
+			"welcome.body": "dsh-purge 是本机 DeepSeek Harness 的提示词与补丁管理插件。应用后会修改本机 DSH 安装目录中的文件。项目源码：",
+			"welcome.repo": "https://github.com/ouli-1242/dsh-purge",
 			"welcome.ban1": "禁止将本项目用于未授权的网络攻击、入侵、窃取数据、破坏系统或任何违法犯罪。",
-			"welcome.ban2": "禁止商业售卖、付费倒卖、黑灰产牟利，以及隐瞒作者的营利性再分发。",
+			"welcome.ban2": "禁止将演练台用于未授权、公网在线或生产环境中的目标。",
 			"welcome.ban3": "使用者须自行遵守所在地法律法规与平台规范；违法后果由行为人自行承担，与作者无关。",
 			"welcome.bans": "禁止事项",
 			"welcome.check": "我已阅读并理解上述用户须知，同意合法合规使用。",
@@ -222,41 +221,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"uninstall.done": "已卸载并还原，正在重启…",
 			"uninstall.done.desktop": "已卸载并还原，正在重启桌面应用…",
 			"uninstall.fail": "卸载失败: {error}",
-			"btn.checkUpdate": "检测更新",
-			"btn.checkUpdate.busy": "检测中…",
-			"btn.doUpdate": "更新",
-			"btn.doUpdate.busy": "更新中…",
-			"channel.title": "通道",
-			"channel.stable": "正式版",
-			"channel.beta": "测试版",
-			"channel.useStable": "切换到正式版",
-			"channel.useBeta": "切换到测试版",
-			"channel.local": "本机",
-			"update.checking": "正在检测更新…",
-			"update.applying": "正在更新…",
-			"update.switching": "正在切换版本…",
-			"update.latest": "已是最新（{version}）",
-			"update.available": "有新版本 {remote}，当前 {local}",
-			"update.pinned": "已固定在 {version}，通道最新是 {remote}",
-			"update.done": "已更新到 {version}",
-			"update.restarting": "已还原并写入新补丁，正在重启…",
-			"update.fullQuit": "补丁已写入。点「重启」后客户端会自己重新打开。",
 			"restart.official.title": "需要重启",
 			"restart.official.body": "补丁已写入。点重启后客户端会自己重新打开。",
-			"update.switched": "已切换到 {version}",
-			"update.autoDone": "已自动更新到 {version}",
-			"update.reloading": "正在刷新设置页…",
-			"update.dirty": "有新版本，本地有改动未自动覆盖",
-			"update.fail": "更新失败: {error}",
-			"update.timeout": "检测超时，请再点一次检测更新",
-			"update.needRestart": "检测接口未加载，请先重启 dsh 再点检测更新",
-			"update.noBeta": "还没有测试版",
-			"update.switch": "切换到此版本",
-			"update.pick": "选择版本",
-			"update.tip": "最新",
-			"update.current": "当前",
-			"update.confirmSwitch": "切换到 {version}？之后可再切回另一通道或其它版本。本地未提交的插件改动不会保留。",
-			"update.confirmChannel": "切换到{version}？会按该通道重新安装插件，本地未提交的插件改动不会保留。",
 			"metric.version": "版本",
 			"action.apply": "应用",
 			"action.revert": "还原",
@@ -429,6 +395,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.82": "主进程兜底 DSH_PROFILE=desktop",
 			"patch.83": "host 信号杀时不报错不弹对话框",
 			"patch.84": "host code=0 正常退出不报错 (消除 stopped 对话框)",
+			"patch.85": "prompt() 的 steer 仍走插话，不压成 followup",
+			"patch.86": "队列插话走 steer；公共 steer() 保持下一步",
 			"status.unlocated": "未定位",
 			"status.na": "本端不需要",
 			"metric.unlocated": "还没定位到本机 Harness",
@@ -472,17 +440,17 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"dock.toggle": "dsh-purge",
 			"dock.newSession": "dsh-purge",
 			"dock.inSession": "dsh-purge",
-			"dock.redteam": "Red team",
+			"dock.redteam": "Drill",
 			"dock.full": "Full view",
 			"dock.close": "Collapse",
 			"dock.unauthorized": "Unauthorized",
 			"welcome.title": "User notice",
 			"welcome.lead": "Please read this on first install. After you confirm, it will not appear again.",
-			"welcome.warn": "This plugin is free and open source. Anyone who sells, resells, or profits from it behind the author's back may face legal action.",
-			"welcome.body": "dsh-purge is a local DeepSeek Harness plugin for security evaluation and cleaning: adjust prompts and patches on a machine you control, and use the drill console only within authorized scope. It is free and non-profit. Repository:",
-			"welcome.repo": "https://github.com/YuJunZhiXue/dsh-purge",
+			"welcome.warn": "Provided under the MIT License. Use it only on machines or in environments you are authorized to manage.",
+			"welcome.body": "dsh-purge is a local DeepSeek Harness plugin for managing prompts and patches. Applying changes modifies files in your local DSH installation. Repository:",
+			"welcome.repo": "https://github.com/ouli-1242/dsh-purge",
 			"welcome.ban1": "Do not use this project for unauthorized attacks, intrusion, data theft, sabotage, or any illegal activity.",
-			"welcome.ban2": "Do not commercially sell, resell, or profit from gray-market use, or redistribute for profit without the author.",
+			"welcome.ban2": "Do not use the drill console against unauthorized targets, public online systems, or production workloads.",
 			"welcome.ban3": "You must follow local law and platform rules; illegal use is solely your responsibility.",
 			"welcome.bans": "Prohibitions",
 			"welcome.check": "I have read and understand this notice and will use the plugin lawfully.",
@@ -562,41 +530,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"uninstall.done": "Uninstalled and restored. Restarting…",
 			"uninstall.done.desktop": "Uninstalled and restored. Restarting the desktop app…",
 			"uninstall.fail": "Uninstall failed: {error}",
-			"btn.checkUpdate": "Check update",
-			"btn.checkUpdate.busy": "Checking…",
-			"btn.doUpdate": "Update",
-			"btn.doUpdate.busy": "Updating…",
-			"channel.title": "Channel",
-			"channel.stable": "Stable",
-			"channel.beta": "Beta",
-			"channel.useStable": "Switch to stable",
-			"channel.useBeta": "Switch to beta",
-			"channel.local": "This copy",
-			"update.checking": "Checking for updates…",
-			"update.applying": "Updating…",
-			"update.switching": "Switching version…",
-			"update.latest": "Up to date ({version})",
-			"update.available": "Update {remote} available (now {local})",
-			"update.pinned": "Pinned at {version}; channel latest is {remote}",
-			"update.done": "Updated to {version}.",
-			"update.restarting": "Restored the old patches, wrote the new ones, and restarting…",
-			"update.fullQuit": "Patches are written. Click Restart and the client opens again by itself.",
 			"restart.official.title": "Restart required",
 			"restart.official.body": "Patches are written. Click Restart and the client opens again by itself.",
-			"update.switched": "Switched to {version}.",
-			"update.autoDone": "Auto-updated to {version}.",
-			"update.reloading": "Refreshing settings…",
-			"update.dirty": "Update available; local edits were not overwritten.",
-			"update.fail": "Update failed: {error}",
-			"update.timeout": "Check timed out. Click Check update again.",
-			"update.needRestart": "Update API is not loaded. Restart dsh, then check again.",
-			"update.noBeta": "No beta build yet",
-			"update.switch": "Switch to this version",
-			"update.pick": "Select version",
-			"update.tip": "latest",
-			"update.current": "current",
-			"update.confirmSwitch": "Switch to {version}? You can switch back later. Uncommitted plugin edits will not be kept.",
-			"update.confirmChannel": "Switch to {version}? The plugin will be reinstalled from that channel. Uncommitted plugin edits will not be kept.",
 			"metric.version": "Version",
 			"action.apply": "Apply",
 			"action.revert": "Restore",
@@ -769,6 +704,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"patch.82": "Fallback DSH_PROFILE=desktop in main process",
 			"patch.83": "Don't fail on signal kill (no crash dialog)",
 			"patch.84": "Don't fail on code=0 clean exit (no stopped dialog)",
+			"patch.85": "prompt() steer stays interrupt, not followup",
+			"patch.86": "Queue steer stays steer; public steer() stays next-step",
 			"status.na": "Not for this host",
 			"metric.sealed": "Official client found. Apply to unpack",
 			"metric.sealed.count": "Sealed",
@@ -1375,18 +1312,11 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			const [ownServers, setOwnServers] = useState("");
 			const [ownLoaded, setOwnLoaded] = useState(false);
 			const [patchBusy, setPatchBusy] = useState(false);
-			const [updateBusy, setUpdateBusy] = useState(false);
-			const [canApplyUpdate, setCanApplyUpdate] = useState(false);
-			const [updateJob, setUpdateJob] = useState(null);
 			const [askRestart, setAskRestart] = useState(false);
 			const suppressRestartAsk = useRef(false);
 			const [askUninstall, setAskUninstall] = useState(false);
 			const [uninstallBusy, setUninstallBusy] = useState(false);
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
-			const [updateNotice, setUpdateNotice] = useState({ kind: "idle", text: "" });
-			const [updateInfo, setUpdateInfo] = useState(null);
-			const [channel, setChannel] = useState("stable");
-			const [pick, setPick] = useState({ stable: "", beta: "" });
 			const actionTicket = useRef(0);
 			const overrideRef = useRef("");
 			const defaultOverrideRef = useRef("");
@@ -1402,152 +1332,12 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				return overrideRef.current;
 			};
 
-			const syncPicks = (d) => {
-				const versions = (d && d.versions) || [];
-				const ceiling = listedCeiling(versions, d && d.localVersion);
-				const next = { stable: "", beta: "" };
-				for (const id of ["stable", "beta"]) {
-					const list = versions.filter((item) => item.channel === id && keepListedVersion(item, ceiling));
-					const hit = preferListed(list, d && d.localVersion, d && d.pin);
-					next[id] = (hit && hit.ref) || "";
-				}
-				setPick(next);
-			};
-
-			const updateErrorText = (tr, e) => {
-				const msg = String((e && e.message) || e || "");
-				if (msg === "timeout" || /aborted|abort|超时/i.test(msg)) return tr("update.timeout");
-				if (/\b404\b/.test(msg) || /non-json/.test(msg)) return tr("update.needRestart");
-				return tr("update.fail", { error: msg });
-			};
-
-			const applyUpdateInfo = useCallback((d, tr, kind) => {
-				if (d.channel) setChannel(d.channel);
-				setUpdateInfo((prev) => {
-					const versions = (d.versions && d.versions.length) ? d.versions : ((prev && prev.versions) || []);
-					return Object.assign({}, prev || {}, d, { versions });
-				});
-				if (d.versions && d.versions.length) syncPicks(d);
-				if (kind === "check") setCanApplyUpdate(Boolean(d.hasUpdate) && !d.error);
-				else if (kind === "done" || kind === "switched" || kind === "channel") setCanApplyUpdate(false);
-				const version = d.localVersion || d.localSha || "—";
-				const remote = d.remoteVersion || d.remoteSha || "—";
-				let text = tr("update.latest", { version });
-				if (d.hasUpdate) text = tr("update.available", { remote, local: version });
-				if (d.pinned && d.hasUpdate) text = tr("update.pinned", { version, remote });
-				if (kind === "switched" || kind === "channel") text = tr("update.switched", { version: d.localVersion || d.remoteVersion || "—" });
-				if (kind === "done") text = tr("update.done", { version: d.localVersion || d.remoteVersion || "—" });
-				if (d.error) text = d.error;
-				setUpdateNotice({ kind: d.ok === false || d.error ? "error" : "ok", text });
-			}, []);
-
-			const checkUpdate = useCallback((id) => {
-				setUpdateBusy(true);
-				setUpdateJob({ id: id || "", kind: "check" });
-				const tr = tRef.current;
-				setUpdateNotice({ kind: "ok", text: tr("update.checking") });
-				apiJson("/dsh-purge/update")
-					.then((d) => {
-						if (!d || (!d.ok && !d.channel)) throw new Error((d && d.error) || "check failed");
-						applyUpdateInfo(d, tr, "check");
-					})
-					.catch((e) => setUpdateNotice({ kind: "error", text: updateErrorText(tr, e) }))
-					.finally(() => {
-						setUpdateBusy(false);
-						setUpdateJob(null);
-					});
-			}, [applyUpdateInfo]);
-
-			const postUpdate = useCallback((body, kind, id) => {
-				setUpdateBusy(true);
-				setUpdateJob({ id: id || "", kind });
-				const tr = tRef.current;
-				setUpdateNotice({ kind: "ok", text: kind === "switched" || kind === "channel" ? tr("update.switching") : tr("update.applying") });
-				return apiJson("/dsh-purge/update", {
-					method: "POST",
-					headers: { "content-type": "application/json" },
-					body: JSON.stringify(body || {}),
-				})
-					.then((d) => {
-						if (!d || (d.ok === false && d.error)) throw new Error((d && d.error) || "update failed");
-						applyUpdateInfo(d, tr, kind);
-						if (d.needsFullQuit) {
-							suppressRestartAsk.current = false;
-							setAskRestart(true);
-							setUpdateNotice({ kind: "ok", text: tr("restart.official.body") });
-							return d;
-						}
-						if (d.restartAfter) {
-							setUpdateNotice({ kind: "ok", text: tr("update.restarting") });
-							return d;
-						}
-						if (d.applied && d.reloadClient !== false) {
-							setUpdateNotice({ kind: "ok", text: tr("update.reloading") });
-							setTimeout(() => {
-								try { window.location.reload(); } catch { /* ignore */ }
-							}, 280);
-						} else if (d.needRestart) {
-							setAskRestart(true);
-						}
-						return d;
-					})
-					.catch((e) => {
-						setUpdateNotice({ kind: "error", text: updateErrorText(tr, e) });
-						throw e;
-					})
-					.finally(() => {
-						setUpdateBusy(false);
-						setUpdateJob(null);
-					});
-			}, [applyUpdateInfo]);
-
-			const doUpdate = useCallback((id) => {
-				const lane = id === "beta" ? "beta" : "stable";
-				postUpdate({ op: "apply", ref: lane === "beta" ? "beta" : "master", channel: lane }, "done", id).catch(() => {});
-			}, [postUpdate]);
-
-			const changeChannel = useCallback((next) => {
-				if (!next) return;
-				const tr = tRef.current;
-				if (!window.confirm(tr("update.confirmChannel", { version: tr("channel." + next) }))) return;
-				const prevChannel = channel;
-				const prevInfo = updateInfo;
-				setChannel(next);
-				setUpdateInfo((cur) => Object.assign({}, cur || {}, { channel: next }));
-				postUpdate({ op: "channel", channel: next }, "channel", next).catch(() => {
-					setChannel(prevChannel);
-					setUpdateInfo(prevInfo);
-				});
-			}, [channel, postUpdate, updateInfo]);
-
-			const switchSelected = useCallback((id) => {
-				const tr = tRef.current;
-				const ref = pick[id];
-				const versions = ((updateInfo && updateInfo.versions) || []).filter((item) => item.channel === id);
-				const hit = versions.find((item) => item.ref === ref);
-				const label = (hit && (hit.label || hit.version)) || ref;
-				if (!ref) return;
-				if (!window.confirm(tr("update.confirmSwitch", { version: label }))) return;
-				const prevChannel = channel;
-				const prevInfo = updateInfo;
-				if (hit && hit.channel) {
-					setChannel(hit.channel);
-					setUpdateInfo((cur) => Object.assign({}, cur || {}, { channel: hit.channel }));
-				}
-				postUpdate({ op: "switch", ref }, "switched", id).catch(() => {
-					setChannel(prevChannel);
-					setUpdateInfo(prevInfo);
-				});
-			}, [channel, pick, postUpdate, updateInfo]);
-
 			const loadAll = useCallback(() => {
 				const tr = tRef.current;
 				apiJson("/dsh-purge/status")
 					.then((d) => {
 						if (d && d.ok) {
 							setState(d);
-							if (d.channel) setChannel(d.channel);
-							if (d.update && d.update.ok && !d.update.error) setUpdateInfo(d.update);
 							if (d.boot_full_quit && !suppressRestartAsk.current) setAskRestart(true);
 						} else {
 							setState({ ok: false, patches_total: 0, patches_applied: 0, patch_status: {}, shim_cmd: "n/a", shim_ps1: "n/a", shim_bin: "n/a", has_backup: false });
@@ -1558,14 +1348,6 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 						setState({ ok: false, patches_total: 0, patches_applied: 0, patch_status: {}, shim_cmd: "n/a", shim_ps1: "n/a", shim_bin: "n/a", has_backup: false });
 						setNotice({ kind: "error", text: tr("err.status", { error: e.message }) });
 					});
-				apiJson("/dsh-purge/update")
-					.then((d) => {
-						if (!d) return;
-						if (d.channel) setChannel(d.channel);
-						setUpdateInfo(d);
-						syncPicks(d);
-					})
-					.catch(() => {});
 				apiJson("/dsh-purge/override")
 					.then((d) => {
 						if (d && d.ok) {
@@ -1837,85 +1619,10 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			if (tally.unmatched) metricNotes.push(t("metric.unmatchedShort", { n: tally.unmatched }));
 			if (tally.skipped) metricNotes.push(t("metric.skipShort", { n: tally.skipped }));
 
-			const versions = (updateInfo && updateInfo.versions) || [];
-			const channelNow = (updateInfo && updateInfo.channel) || channel || "stable";
-			const localVer = (s && s.plugin_version) || (updateInfo && updateInfo.localVersion) || "";
-			const renderEdition = (id) => {
-				const lane = (updateInfo && updateInfo.lanes && updateInfo.lanes[id]) || {};
-				const ceiling = listedCeiling(versions, localVer || (updateInfo && updateInfo.localVersion));
-				const list = versions.filter((item) => item.channel === id && keepListedVersion(item, ceiling));
-				const selectedRef = pick[id] || "";
-				const hit = list.find((item) => item.ref === selectedRef) || preferListed(list, localVer, updateInfo && updateInfo.pin);
-				const onLane = channelNow === id;
-				const noBeta = id === "beta" && Array.isArray(updateInfo && updateInfo.versions) && !list.length;
-				const pickedOther = Boolean(hit && selectedRef && !hit.current);
-				const thisJob = updateJob && updateJob.id === id ? updateJob : null;
-				let actionLabel = t("btn.checkUpdate");
-				let actionKind;
-				let actionClick = () => checkUpdate(id);
-				let actionDisabled = updateBusy || Boolean(noBeta);
-				if (noBeta) {
-					actionLabel = t("update.noBeta");
-					actionClick = () => {};
-				} else if (pickedOther) {
-					actionLabel = t("update.switch");
-					actionKind = "primary";
-					actionClick = () => switchSelected(id);
-				} else if (!onLane) {
-					actionLabel = id === "beta" ? t("channel.useBeta") : t("channel.useStable");
-					actionKind = "primary";
-					actionClick = () => changeChannel(id);
-				} else if (canApplyUpdate && lane.hasUpdate) {
-					actionLabel = t("btn.doUpdate");
-					actionKind = "primary";
-					actionClick = () => doUpdate(id);
-				}
-				if (thisJob) {
-					if (thisJob.kind === "check") actionLabel = t("btn.checkUpdate.busy");
-					else if (thisJob.kind === "done") actionLabel = t("btn.doUpdate.busy");
-					else actionLabel = t("update.switching");
-				}
-				return h("div", {
-					className: "dshp-edition" + (onLane ? " is-on" : ""),
-					"aria-label": t("channel." + id),
-				},
-					h("span", { className: "dshp-edition-name" },
-						t("channel." + id),
-						onLane ? h("em", { className: "dshp-now-mark" }, t("update.current")) : null,
-					),
-					h("select", {
-						className: "dshp-field dshp-ver",
-						value: list.length ? ((hit && hit.ref) || "") : "",
-						disabled: updateBusy || !list.length,
-						onChange: (e) => setPick((prev) => Object.assign({}, prev, { [id]: e.target.value })),
-						"aria-label": t("update.pick"),
-					},
-						list.length
-							? list.map((item) => h("option", {
-								key: item.ref + (item.sha || ""),
-								value: item.ref,
-							}, versionChoiceLabel(item, t)))
-							: h("option", { value: "" }, noBeta ? t("update.noBeta") : t("update.pick")),
-					),
-					h(Btn, { tiny: true, kind: actionKind, disabled: actionDisabled, onClick: actionClick }, actionLabel),
-				);
-			};
 			return h("section", { className: "dshp-panel", "aria-label": t("purge.title") },
 				h("div", { className: "dshp-head" },
 					h("h3", { className: "dshp-title" }, t("purge.title")),
 					h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
-				),
-				h("div", { className: "dshp-rel" },
-					h("div", { className: "dshp-now" },
-						h("span", { className: "dshp-now-label" }, t("channel.local")),
-						h("b", { className: "dshp-now-ver" }, localVer ? "v" + localVer : "—"),
-						h("em", { className: "dshp-now-mark" }, t("update.current")),
-					),
-					h("div", { className: "dshp-editions" },
-						renderEdition("stable"),
-						renderEdition("beta"),
-					),
-					noticeNode(updateNotice),
 				),
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },
@@ -2323,74 +2030,6 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			if (+parts[1] !== 1) return +parts[1] > 1;
 			if (+parts[2] !== 1) return +parts[2] > 1;
 			return +parts[3] >= 12;
-		}
-
-		function splitListedVersion(raw) {
-			const text = String(raw || "").trim().replace(/^v/i, "");
-			const cut = text.split("-");
-			const core = String(cut[0] || "").split(".").map((n) => parseInt(n, 10) || 0);
-			return { core: [core[0] || 0, core[1] || 0, core[2] || 0], pre: cut.slice(1).join("-") };
-		}
-
-		function listedVersionNewer(remote, local) {
-			if (!remote || !local || String(remote) === String(local)) return false;
-			const a = splitListedVersion(remote);
-			const b = splitListedVersion(local);
-			for (let i = 0; i < 3; i += 1) {
-				if (a.core[i] !== b.core[i]) return a.core[i] > b.core[i];
-			}
-			if (a.pre && !b.pre) return false;
-			if (!a.pre && b.pre) return true;
-			return a.pre > b.pre;
-		}
-
-		function listedCeiling(versions, localVer) {
-			let best = "";
-			const rows = (versions || []).slice();
-			const local = String(localVer || "").replace(/^v/i, "");
-			if (local && !/(?:^|[-._])(beta|rc|pre|preview|test)(?:\d|$|[-._])/i.test(local)) {
-				rows.push({ channel: "stable", version: local });
-			}
-			for (const item of rows) {
-				if (!item || item.channel === "beta") continue;
-				const ver = String(item.version || "").replace(/^v/i, "");
-				if (!/^\d+\.\d+\.\d+/.test(ver) || /(?:^|[-._])(beta|rc|pre|preview|test)(?:\d|$|[-._])/i.test(ver)) continue;
-				if (!best || listedVersionNewer(ver, best)) best = ver;
-			}
-			return best;
-		}
-
-		function keepListedVersion(item, _ceiling) {
-			const ver = String((item && (item.version || item.ref || item.id)) || "");
-			if (!item) return false;
-			if (item.ref === "beta" || item.id === "beta") return true;
-			if (item.channel === "beta") return false;
-			if (/(?:^|[-._])(beta|rc|pre|preview|test)(?:\d|$|[-._])/i.test(ver)) return false;
-			return true;
-		}
-
-		function preferListed(list, localVer, pin) {
-			const pinned = pin ? (list || []).find((item) => item.ref === pin) : null;
-			if (pinned) return pinned;
-			const ver = String(localVer || "").replace(/^v/i, "");
-			const same = (list || []).filter((item) => ver && String(item.version || "").replace(/^v/i, "") === ver);
-			if (same.length) {
-				return same.find((item) => item.current)
-					|| same.find((item) => item.latest)
-					|| same[0];
-			}
-			return (list || []).find((item) => item.current)
-				|| (list || []).find((item) => item.latest)
-				|| (list || [])[0]
-				|| null;
-		}
-
-		function versionChoiceLabel(item, tr) {
-			const ver = String((item && item.version) || "").replace(/^v/i, "");
-			const base = ver ? ("v" + ver) : ((item && (item.label || item.ref)) || "—");
-			if (item && item.current) return base + " · " + tr("update.current");
-			if (item && item.latest) return base + " · " + tr("update.tip");
-			return base;
 		}
 
 		function SkillsSection() {
@@ -4038,20 +3677,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(req),
-    }).then(async (res) => {
-      const text = await res.text().catch(() => '')
-      let data = null
-      try { data = text ? JSON.parse(text) : null } catch {
-        return { ok: false, error: res.status + ' non-json: ' + String(text).slice(0, 120) }
-      }
-      if (!res.ok) {
-        return Object.assign({}, data || {}, {
-          ok: false,
-          error: (data && (data.error || data.message)) || (res.status + ' ' + res.statusText),
-        })
-      }
-      return data
-    })
+    }).then((res) => res.json())
 
     let ui = { open: true, tab: 'assets' }
     const subs = new Set()
@@ -5571,8 +5197,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           a.href = url
           a.download = 'report-' + String(label || 'score').replace(/[^\w.\-]/g, '_') + '.md'
           a.click()
-          /* 立刻 revoke 会在部分浏览器里让 click 启动的下载断流,延后一拍 */
-          setTimeout(() => { try { URL.revokeObjectURL(url) } catch { /* ignore */ } }, 1000)
+          URL.revokeObjectURL(url)
           setMsg({ ok: '已下载：' + label })
         } catch (e) { setMsg({ err: '下载失败：' + ((e && e.message) || e) }) }
       }
@@ -7153,132 +6778,6 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
           + '建议从 2–3 开始，只有在确认 Key 的额度足够、任务之间确实互不依赖时才调大。'))
     }
 
-    /**
-     * 版本显示 + 自动更新按钮。
-     *
-     * 行为：挂载时静默查一次最新版本（npm registry），有新版本就把按钮点亮成
-     * 「有新版本 vX」；点击弹出确认框（当前版本 / 最新版本 / 安装位置 / 阻塞项），
-     * 确认后由 host 侧执行 安装 → 重启 dsh web（页面会断开，重启后刷新即可）。
-     */
-    function VersionBar(props) {
-      const [info, setInfo] = React.useState(null)
-      const [err, setErr] = React.useState(null)
-      const [busy, setBusy] = React.useState(false)
-      const [open, setOpen] = React.useState(false)
-      const [msg, setMsg] = React.useState(null)
-      const [countdown, setCountdown] = React.useState(0)
-      const countdownRef = React.useRef(null)
-      const clearCountdown = React.useCallback(() => {
-        if (countdownRef.current) { try { clearInterval(countdownRef.current) } catch { /* ignore */ } }
-        countdownRef.current = null
-      }, [])
-      React.useEffect(() => () => clearCountdown(), [clearCountdown])
-      const closeModal = React.useCallback(() => {
-        clearCountdown()
-        setCountdown(0)
-        setOpen(false)
-      }, [clearCountdown])
-
-      const check = (silent) => {
-        if (!silent) setBusy(true)
-        api({ op: 'updateCheck' }).then((r) => {
-          setBusy(false)
-          if (!r || r.ok === false) {
-            /* 开发态或查不到 registry：只显示当前版本，不报错打扰用户 */
-            if (!silent) setErr((r && r.error) || '检查更新失败')
-            api({ op: 'version' }).then((v) => { if (v && v.ok !== false) setInfo(v) }, () => {})
-            return
-          }
-          setErr(null)
-          setInfo(r)
-        }, (e) => {
-          setBusy(false)
-          if (!silent) setErr(String((e && e.message) || e))
-          api({ op: 'version' }).then((v) => { if (v && v.ok !== false) setInfo(v) }, () => {})
-        })
-      }
-      React.useEffect(() => { check(true) }, [])
-
-      const apply = () => {
-        setBusy(true)
-        setMsg(null)
-        api({ op: 'updateApply', target: (info && info.latest) || undefined }).then((r) => {
-          setBusy(false)
-          if (!r || r.ok === false) { setMsg({ err: (r && r.error) || '更新失败' }); return }
-          setMsg({ ok: '已安装 ' + (r.installed || '') + '，正在重启当前宿主…' })
-          /* 重启会断开这个页面：倒计时提示用户稍后刷新 */
-          setCountdown(6)
-          clearCountdown()
-          countdownRef.current = setInterval(() => {
-            setCountdown((n) => {
-              if (n <= 1) { clearCountdown(); window.location.reload(); return 0 }
-              return n - 1
-            })
-          }, 1000)
-        }, (e) => { setBusy(false); setMsg({ err: String((e && e.message) || e) }) })
-      }
-
-      const current = info && info.current ? info.current : (info && info.plugin ? info.plugin.version : null)
-      const latest = info && info.latest ? info.latest : null
-      const hasNew = !!(info && info.updateAvailable)
-      const blockers = (info && info.blockers) || []
-      const notes = (info && info.notes) || []
-      const mode = info && info.install ? info.install.mode : null
-
-      return h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 6 } },
-        h('span', {
-          className: 'rt-tag' + (hasNew ? ' rt-tag-warn' : ''),
-          title: ('当前版本 ' + (current || '未知') + (latest ? '\n最新版本 ' + latest : '')
-            + (mode === 'dev' ? '\n安装方式：开发态（源码软链）' : mode === 'package' ? '\n安装方式：包安装' : '')
-            + (info && info.check_error ? '\n检查失败：' + info.check_error : '')),
-        }, 'v' + (current || '?')),
-        hasNew
-          ? h('button', {
-              className: 'rt-btn rt-btn-primary', disabled: busy,
-              onClick: () => { setOpen(true); setMsg(null) },
-              title: '发现新版本 ' + latest + '：点击查看并一键更新（会重启当前宿主）',
-            }, busy ? '检查中…' : '有新版本 v' + latest)
-          : h('button', {
-              className: 'rt-btn', disabled: busy, onClick: () => check(false),
-              title: '重新检查 npm 上的最新版本',
-            }, busy ? '检查中…' : '检查更新'),
-        open
-          ? h('div', { className: 'rt-modal', 'aria-hidden': 'true', onClick: closeModal },
-              h('div', { className: 'rt-modal-box', onClick: (e) => e.stopPropagation() },
-                h('h4', { style: { marginTop: 0 } }, '更新 RedTeam 模式'),
-                h('div', { className: 'rt-kv' }, h('b', null, '当前版本'), h('span', null, current || '未知')),
-                h('div', { className: 'rt-kv' }, h('b', null, '最新版本'), h('span', null, latest || '未知')),
-                h('div', { className: 'rt-kv' }, h('b', null, '安装方式'),
-                  h('span', null, mode === 'dev' ? '开发态（源码软链）' : mode === 'package' ? '包安装（' + ((info.install && info.install.packageManager) || 'npm') + '）' : '未知')),
-                info && info.install && info.install.dir
-                  ? h('div', { className: 'rt-kv' }, h('b', null, '安装位置'), h('span', { className: 'rt-mono' }, info.install.dir))
-                  : null,
-                blockers.length
-                  ? h('div', { className: 'rt-hint' },
-                      h('div', { style: { fontWeight: 600, marginBottom: 4 } }, '现在不能更新：'),
-                      blockers.map((b, i) => h('div', { key: 'b' + i }, '· ' + b)))
-                  : null,
-                notes.length
-                  ? h('div', { className: 'rt-foot', style: { padding: '4px 0' } }, notes.map((n, i) => h('div', { key: 'n' + i }, n)))
-                  : null,
-                h('div', { style: { fontSize: 12, color: 'var(--dsw-alias-label-secondary)', margin: '8px 0' } },
-                  '更新过程：安装新版本 → 自动重启当前宿主（官方 exe / 社区版 / dsh web；当前页面会断开，约 5–10 秒后自动刷新）。'
-                  + '重启前会检查有没有智能体在跑，有就拦住不动。'),
-                msg ? h('div', { className: msg.err ? 'rt-err' : 'rt-foot' }, msg.err || msg.ok) : null,
-                countdown > 0
-                  ? h('div', { className: 'rt-foot' }, '宿主正在重启，' + countdown + ' 秒后自动刷新页面…')
-                  : null,
-                h('div', { style: { display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 10 } },
-                  h('button', { className: 'rt-btn', onClick: closeModal }, '关闭'),
-                  h('button', {
-                    className: 'rt-btn rt-btn-primary',
-                    disabled: busy || blockers.length > 0 || mode === 'dev',
-                    title: mode === 'dev' ? '开发态安装请用仓库流程升级' : blockers.length ? '先解决上面的阻塞项' : '安装并重启',
-                    onClick: apply,
-                  }, busy ? '更新中…' : '一键更新并重启'))))
-          : null)
-    }
-
     /* ---------------------------------------------------------- 常驻面板主体 */
     /**
      * 「未读」状态：按靶标记在 localStorage 里，每 25 秒问一次 host 的 consoleDigest
@@ -7602,7 +7101,6 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
             engagements.map((x) => h('option', { key: x.id, value: x.id }, x.name || x.id || '未命名')),
           ),
           h('div', { className: 'rt-spacer' }),
-          embedded ? null : h(VersionBar, null),
           full ? h('button', { className: 'rt-btn', title: '回到带侧栏的普通界面（或按 Esc）', onClick: exitFull }, '退出全面浏览') : null,
           embedded ? null : h('button', { className: 'rt-btn', title: '刷新名册、快照与当前页面数据', onClick: refreshAll }, '刷新'),
           (full || embedded) ? null : h('button', { className: 'rt-btn', title: '在新浏览器窗口打开完整控制台', onClick: openFull }, '全面浏览'),
@@ -7693,7 +7191,7 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 		let drillGrantPosting = 0;
 		let drillGrantState = { ready: false, granted: false };
 		let drillSyncRetryTimer = null;
-		const AUTH_LEGAL_HTML = "<h3>严正法律免责与合规使用声明</h3>\r\n    <p>本声明在进入演练台前必须全文阅读。本项目是非营利开源项目，遵守国家法律法规及所在平台的规范，仅供学习与研究、技术参考。严禁任何主体把本项目用于商业售卖、付费倒卖或黑灰产牟利。</p>\r\n    <p>开发者坚决反对并严禁任何形式的违法犯罪，绝不支持、不鼓励、不协助未授权网络攻击、漏洞利用、数据窃取、非法侵入计算机信息系统，或生成违法违禁内容。任何将本项目用于违法犯罪的行为，均与开发者无关，由行为人依法独立承担全部法律责任。不得以科研、教学、测试、演示或内部学习为由规避下列条款。</p>\r\n    <h3>1. 本仓库不含违法内容</h3>\r\n    <p>dsh-purge 发布的代码、文档、补丁与默认提示词不是木马、后门、未授权渗透工具、勒索软件、撞库脚本，也不是针对公网或第三方系统的攻击载荷。项目不提供违法内容，也不教唆、组织、协助实施违法犯罪。</p>\r\n    <h3>2. 本机操作不构成对外授权</h3>\r\n    <p>应用补丁、写入、回滚、卸载，都在本机文件和本机进程内完成。这些操作不对任何公网主机或未授权系统进行扫描、探测、入侵或攻击发包，也不得把本机当作跳板。</p>\r\n    <p>插件若开启检测更新，仅可能访问本插件自己的 GitHub 仓库以核对版本。该访问与对第三方系统的网络攻击无关，不能被解释为对外渗透的授权。</p>\r\n    <h3>3. 允许使用的范围</h3>\r\n    <p>只允许用在你能证明有权处理的环境：本人有权管理的本机官方 Harness；离线的本地合成靶标；所有者已经出具合法书面授权的网络安全演练靶场；合规实验室里的受控环境。书面授权要能对应具体目标、时间和范围。只填写一个单位名称，或只有口头说法，不构成授权。</p>\r\n    <p>未经所有者合法书面授权的目标、公网在线系统、生产业务，以及能源、交通、水利、金融、公共服务、电子政务等关键信息基础设施，都不得作为演练对象。</p>\r\n    <h3>4. 必须遵守的法律，按条、款</h3>\r\n    <p>《中华人民共和国刑法》第二百八十五条第一款：禁止违反国家规定，侵入国家事务、国防建设、尖端科学技术领域的计算机信息系统。</p>\r\n    <p>同条第二款：禁止侵入前款规定以外的计算机信息系统，或者用其他技术手段，获取该系统中存储、处理或者传输的数据，或者对该系统实施非法控制。</p>\r\n    <p>同条第三款：禁止提供专门用于侵入、非法控制计算机信息系统的程序、工具；明知他人实施侵入、非法控制而为其提供程序、工具，同样禁止。</p>\r\n    <p>第二百八十六条第一款：禁止对计算机信息系统功能进行删除、修改、增加、干扰，造成系统不能正常运行。</p>\r\n    <p>同条第二款：禁止对系统中存储、处理或者传输的数据和应用程序进行删除、修改、增加。</p>\r\n    <p>同条第三款：禁止故意制作、传播计算机病毒等破坏性程序，影响计算机系统正常运行。</p>\r\n    <p>第二百八十七条：禁止利用计算机实施金融诈骗、盗窃、贪污、挪用公款、窃取国家秘密或者其他犯罪。</p>\r\n    <p>第二百八十七条之一第一款第（一）项：禁止设立用于实施诈骗、传授犯罪方法、制作或者销售违禁物品、管制物品等违法犯罪活动的网站、通讯群组。</p>\r\n    <p>同款第（二）项：禁止发布有关制作或者销售毒品、枪支、淫秽物品等违禁物品、管制物品或者其他违法犯罪的信息。</p>\r\n    <p>同款第（三）项：禁止为实施诈骗等违法犯罪活动发布信息。</p>\r\n    <p>第二百八十七条之二：禁止明知他人利用信息网络实施犯罪，仍为其提供技术支持，或者提供广告推广、支付结算等帮助。</p>\r\n    <p>第二百五十三条之一第一款、第三款：禁止向他人出售或者提供公民个人信息；禁止窃取或者以其他方法非法获取公民个人信息。</p>\r\n    <p>《中华人民共和国网络安全法》第十三条第二款：使用网络不得危害网络安全，不得利用网络从事危害国家安全、荣誉和利益，煽动颠覆国家政权、推翻社会主义制度，煽动分裂国家、破坏国家统一，宣扬恐怖主义、极端主义，宣扬民族仇恨、民族歧视，传播暴力、淫秽色情信息，编造、传播虚假信息扰乱经济秩序和社会秩序，以及侵害他人名誉、隐私、知识产权和其他合法权益等活动。</p>\r\n    <p>第十四条：禁止利用网络从事危害未成年人身心健康的活动。</p>\r\n    <p>第二十九条：禁止非法侵入他人网络、干扰他人网络正常功能、窃取网络数据；禁止提供专门用于侵入网络、干扰网络正常功能及防护措施、窃取网络数据的程序、工具；明知他人从事危害网络安全的活动，禁止为其提供技术支持、广告推广、支付结算等帮助。</p>\r\n    <p>第三十三条：公共通信和信息服务、能源、交通、水利、金融、公共服务、电子政务等关键信息基础设施实行重点保护。未获合法授权，不得侵入、干扰或破坏。</p>\r\n    <p>第四十六条：禁止窃取或者以其他非法方式获取个人信息，禁止非法出售或者非法向他人提供个人信息。</p>\r\n    <p>第四十八条：禁止设立用于实施诈骗，传授犯罪方法，制作或者销售违禁物品、管制物品等违法犯罪活动的网站、通讯群组；禁止利用网络发布涉及上述违法犯罪活动的信息。</p>\r\n    <p>第五十条：发送的电子信息、提供的应用软件不得设置恶意程序，不得含有法律、行政法规禁止发布或者传输的信息。</p>\r\n    <p>《中华人民共和国数据安全法》第八条：开展数据处理活动，不得危害国家安全、公共利益，不得损害个人、组织的合法权益。</p>\r\n    <p>第三十二条第一款：收集数据应当采取合法、正当的方式，不得窃取或者以其他非法方式获取数据。</p>\r\n    <p>同条第二款：法律、行政法规对收集、使用数据的目的和范围有规定的，只能在该目的和范围内收集、使用。</p>\r\n    <p>第五十一条：窃取或者以其他非法方式获取数据，或者因此损害个人、组织合法权益的，依照有关法律、行政法规处罚。</p>\r\n    <p>《中华人民共和国个人信息保护法》第五条：处理个人信息应当合法、正当、必要、诚信，不得通过误导、欺诈、胁迫等方式处理。</p>\r\n    <p>第六条第一款、第二款：处理个人信息应当具有明确、合理的目的，并与该目的直接相关，采取对个人权益影响最小的方式；收集限于实现处理目的的最小范围，不得过度收集。</p>\r\n    <p>第十条：禁止非法收集、使用、加工、传输他人个人信息，禁止非法买卖、提供或者公开他人个人信息；禁止从事危害国家安全、公共利益的个人信息处理活动。</p>\r\n    <p>第十三条：没有取得个人同意，也不属于订立履行合同所必需、履行法定职责、应对突发、公共利益新闻舆论、处理本人已经合法公开的信息，以及法律行政法规规定的其他情形之一的，不得处理个人信息。</p>\r\n    <p>第二十八条、第二十九条：生物识别、医疗健康、金融账户、行踪轨迹，以及不满十四周岁未成年人的个人信息，属于敏感个人信息。没有特定目的、充分必要性和严格保护措施，并且没有取得个人单独同意的，不得处理。</p>\r\n    <p>此外还须遵守其他现行有效的法律、行政法规、监管规定，以及所使用模型的服务条款与滥用政策。</p>\r\n    <h3>5. 据此禁止的方向</h3>\r\n    <p>未授权进入。禁止把没有书面授权的单位、域名、地址、公网系统、生产业务或关键信息基础设施登记为靶标，禁止对其扫描、探测、侵入、控制或发包。对应刑法第二百八十五条第一款、第二款，网络安全法第二十九条、第三十三条。</p>\r\n    <p>破坏与恶意程序。禁止删除、修改、增加、干扰他人系统功能或其中的数据、应用程序；禁止制作、传播病毒、勒索程序或其他破坏性程序；禁止在信息或软件中设置恶意程序。对应刑法第二百八十六条第一款至第三款，网络安全法第五十条。</p>\r\n    <p>工具与帮助。禁止把本项目或本机提供给他人，用于侵入、非法控制或窃取数据；禁止明知对方在实施网络犯罪，仍提供程序、工具、技术支持、广告推广或支付结算。对应刑法第二百八十五条第三款、第二百八十七条之二，网络安全法第二十九条。</p>\r\n    <p>数据。禁止窃取、非法收集、超范围使用、泄露、出售或向他人提供业务数据、账号、口令和其他受保护数据。对应数据安全法第八条、第三十二条、第五十一条。</p>\r\n    <p>个人信息。禁止非法收集、使用、加工、传输、买卖、提供或公开他人个人信息；禁止过度收集；禁止以误导、欺诈、胁迫方式处理；禁止擅自处理生物识别、医疗健康、金融账户、行踪轨迹和儿童个人信息。对应刑法第二百五十三条之一第一款、第三款，网络安全法第四十六条，个人信息保护法第五条、第六条、第十条、第十三条、第二十八条、第二十九条。</p>\r\n    <p>诈骗与违法信息。禁止设立或利用网站、群组实施诈骗、传授犯罪方法、制作或销售违禁物品、管制物品；禁止发布此类信息；禁止利用计算机实施诈骗、盗窃、贪污、挪用公款、窃取国家秘密。对应刑法第二百八十七条、第二百八十七条之一第一款第（一）项至第（三）项，网络安全法第四十八条。</p>\r\n    <p>内容。禁止生成或传播危害国家安全、荣誉和利益的内容，禁止煽动颠覆、分裂，禁止恐怖主义、极端主义、民族仇恨，禁止暴力、淫秽色情、赌博，禁止编造虚假信息扰乱经济秩序和社会秩序，禁止侵害名誉、隐私、知识产权，禁止危害未成年人身心健康的内容。对应网络安全法第十三条第二款、第十四条。</p>\r\n    <p>结果扩散。演练中形成的记录、资产信息和文件，只留在书面授权写明的目标和期限里，不得交给无权获知的人，也不得改作授权以外的用途。</p>\r\n    <h3>6. 责任由使用者承担</h3>\r\n    <p>本项目依据 MIT 协议按现状提供。开发者不就完整性、安全性与适用性作保证。使用者对自己的下载、部署、运行、修改、传播，以及全部输入与输出，承担独立、完全的民事、行政及刑事法律责任。作者与贡献者不承担因滥用产生的直接、间接或连带责任。</p>\r\n    <p>勾选确认的是操作者本人，不能代替没有阅读本声明的人，也不能把别人的系统说成已经授权。</p>\r\n    <h3>7. 违约即终止授权</h3>\r\n    <p>一旦用于非法攻击、恶意活动或上述任一禁止方向，使用许可自该行为发生之日起自动终止，且不可撤销。必须立即停止使用，并销毁本项目的代码、脚本与衍生数据，依法承担责任。授权终止后，演练台不得继续打开或继续使用。</p>\r\n    <h3>8. 与 DeepSeek 官方的关系</h3>\r\n    <p>本项目是独立的开源项目，与 DeepSeek 官方或其关联主体没有隶属、商业合作、授权或官方背书。文中的「官方」只表示评测对象是使用者本机安装的官方 DeepSeek Harness 软件包，不代表 DeepSeek 官方开发、认可或担保本插件。</p>\r\n    <p>文末。倒计时结束、滚到这里并勾选全部三项，才表示你以本人身份认可本声明，并完成本次演练台授权。</p>";
+		const AUTH_LEGAL_HTML = "<h3>严正法律免责与合规使用声明</h3>\r\n    <p>本声明在进入演练台前必须全文阅读。本项目是非营利开源项目，遵守国家法律法规及所在平台的规范，仅供学习与研究、技术参考。严禁任何主体把本项目用于商业售卖、付费倒卖或黑灰产牟利。</p>\r\n    <p>开发者坚决反对并严禁任何形式的违法犯罪，绝不支持、不鼓励、不协助未授权网络攻击、漏洞利用、数据窃取、非法侵入计算机信息系统，或生成违法违禁内容。任何将本项目用于违法犯罪的行为，均与开发者无关，由行为人依法独立承担全部法律责任。不得以科研、教学、测试、演示或内部学习为由规避下列条款。</p>\r\n    <h3>1. 本仓库不含违法内容</h3>\r\n    <p>dsh-purge 发布的代码、文档、补丁与默认提示词不是木马、后门、未授权渗透工具、勒索软件、撞库脚本，也不是针对公网或第三方系统的攻击载荷。项目不提供违法内容，也不教唆、组织、协助实施违法犯罪。</p>\r\n    <h3>2. 本机操作不构成对外授权</h3>\r\n    <p>应用补丁、写入、回滚、卸载，都在本机文件和本机进程内完成。这些操作不对任何公网主机或未授权系统进行扫描、探测、入侵或攻击发包，也不得把本机当作跳板。</p>\r\n    <p>插件不联网检查更新，也不会访问上游仓库。</p>\r\n    <h3>3. 允许使用的范围</h3>\r\n    <p>只允许用在你能证明有权处理的环境：本人有权管理的本机官方 Harness；离线的本地合成靶标；所有者已经出具合法书面授权的网络安全演练靶场；合规实验室里的受控环境。书面授权要能对应具体目标、时间和范围。只填写一个单位名称，或只有口头说法，不构成授权。</p>\r\n    <p>未经所有者合法书面授权的目标、公网在线系统、生产业务，以及能源、交通、水利、金融、公共服务、电子政务等关键信息基础设施，都不得作为演练对象。</p>\r\n    <h3>4. 必须遵守的法律，按条、款</h3>\r\n    <p>《中华人民共和国刑法》第二百八十五条第一款：禁止违反国家规定，侵入国家事务、国防建设、尖端科学技术领域的计算机信息系统。</p>\r\n    <p>同条第二款：禁止侵入前款规定以外的计算机信息系统，或者用其他技术手段，获取该系统中存储、处理或者传输的数据，或者对该系统实施非法控制。</p>\r\n    <p>同条第三款：禁止提供专门用于侵入、非法控制计算机信息系统的程序、工具；明知他人实施侵入、非法控制而为其提供程序、工具，同样禁止。</p>\r\n    <p>第二百八十六条第一款：禁止对计算机信息系统功能进行删除、修改、增加、干扰，造成系统不能正常运行。</p>\r\n    <p>同条第二款：禁止对系统中存储、处理或者传输的数据和应用程序进行删除、修改、增加。</p>\r\n    <p>同条第三款：禁止故意制作、传播计算机病毒等破坏性程序，影响计算机系统正常运行。</p>\r\n    <p>第二百八十七条：禁止利用计算机实施金融诈骗、盗窃、贪污、挪用公款、窃取国家秘密或者其他犯罪。</p>\r\n    <p>第二百八十七条之一第一款第（一）项：禁止设立用于实施诈骗、传授犯罪方法、制作或者销售违禁物品、管制物品等违法犯罪活动的网站、通讯群组。</p>\r\n    <p>同款第（二）项：禁止发布有关制作或者销售毒品、枪支、淫秽物品等违禁物品、管制物品或者其他违法犯罪的信息。</p>\r\n    <p>同款第（三）项：禁止为实施诈骗等违法犯罪活动发布信息。</p>\r\n    <p>第二百八十七条之二：禁止明知他人利用信息网络实施犯罪，仍为其提供技术支持，或者提供广告推广、支付结算等帮助。</p>\r\n    <p>第二百五十三条之一第一款、第三款：禁止向他人出售或者提供公民个人信息；禁止窃取或者以其他方法非法获取公民个人信息。</p>\r\n    <p>《中华人民共和国网络安全法》第十三条第二款：使用网络不得危害网络安全，不得利用网络从事危害国家安全、荣誉和利益，煽动颠覆国家政权、推翻社会主义制度，煽动分裂国家、破坏国家统一，宣扬恐怖主义、极端主义，宣扬民族仇恨、民族歧视，传播暴力、淫秽色情信息，编造、传播虚假信息扰乱经济秩序和社会秩序，以及侵害他人名誉、隐私、知识产权和其他合法权益等活动。</p>\r\n    <p>第十四条：禁止利用网络从事危害未成年人身心健康的活动。</p>\r\n    <p>第二十九条：禁止非法侵入他人网络、干扰他人网络正常功能、窃取网络数据；禁止提供专门用于侵入网络、干扰网络正常功能及防护措施、窃取网络数据的程序、工具；明知他人从事危害网络安全的活动，禁止为其提供技术支持、广告推广、支付结算等帮助。</p>\r\n    <p>第三十三条：公共通信和信息服务、能源、交通、水利、金融、公共服务、电子政务等关键信息基础设施实行重点保护。未获合法授权，不得侵入、干扰或破坏。</p>\r\n    <p>第四十六条：禁止窃取或者以其他非法方式获取个人信息，禁止非法出售或者非法向他人提供个人信息。</p>\r\n    <p>第四十八条：禁止设立用于实施诈骗，传授犯罪方法，制作或者销售违禁物品、管制物品等违法犯罪活动的网站、通讯群组；禁止利用网络发布涉及上述违法犯罪活动的信息。</p>\r\n    <p>第五十条：发送的电子信息、提供的应用软件不得设置恶意程序，不得含有法律、行政法规禁止发布或者传输的信息。</p>\r\n    <p>《中华人民共和国数据安全法》第八条：开展数据处理活动，不得危害国家安全、公共利益，不得损害个人、组织的合法权益。</p>\r\n    <p>第三十二条第一款：收集数据应当采取合法、正当的方式，不得窃取或者以其他非法方式获取数据。</p>\r\n    <p>同条第二款：法律、行政法规对收集、使用数据的目的和范围有规定的，只能在该目的和范围内收集、使用。</p>\r\n    <p>第五十一条：窃取或者以其他非法方式获取数据，或者因此损害个人、组织合法权益的，依照有关法律、行政法规处罚。</p>\r\n    <p>《中华人民共和国个人信息保护法》第五条：处理个人信息应当合法、正当、必要、诚信，不得通过误导、欺诈、胁迫等方式处理。</p>\r\n    <p>第六条第一款、第二款：处理个人信息应当具有明确、合理的目的，并与该目的直接相关，采取对个人权益影响最小的方式；收集限于实现处理目的的最小范围，不得过度收集。</p>\r\n    <p>第十条：禁止非法收集、使用、加工、传输他人个人信息，禁止非法买卖、提供或者公开他人个人信息；禁止从事危害国家安全、公共利益的个人信息处理活动。</p>\r\n    <p>第十三条：没有取得个人同意，也不属于订立履行合同所必需、履行法定职责、应对突发、公共利益新闻舆论、处理本人已经合法公开的信息，以及法律行政法规规定的其他情形之一的，不得处理个人信息。</p>\r\n    <p>第二十八条、第二十九条：生物识别、医疗健康、金融账户、行踪轨迹，以及不满十四周岁未成年人的个人信息，属于敏感个人信息。没有特定目的、充分必要性和严格保护措施，并且没有取得个人单独同意的，不得处理。</p>\r\n    <p>此外还须遵守其他现行有效的法律、行政法规、监管规定，以及所使用模型的服务条款与滥用政策。</p>\r\n    <h3>5. 据此禁止的方向</h3>\r\n    <p>未授权进入。禁止把没有书面授权的单位、域名、地址、公网系统、生产业务或关键信息基础设施登记为靶标，禁止对其扫描、探测、侵入、控制或发包。对应刑法第二百八十五条第一款、第二款，网络安全法第二十九条、第三十三条。</p>\r\n    <p>破坏与恶意程序。禁止删除、修改、增加、干扰他人系统功能或其中的数据、应用程序；禁止制作、传播病毒、勒索程序或其他破坏性程序；禁止在信息或软件中设置恶意程序。对应刑法第二百八十六条第一款至第三款，网络安全法第五十条。</p>\r\n    <p>工具与帮助。禁止把本项目或本机提供给他人，用于侵入、非法控制或窃取数据；禁止明知对方在实施网络犯罪，仍提供程序、工具、技术支持、广告推广或支付结算。对应刑法第二百八十五条第三款、第二百八十七条之二，网络安全法第二十九条。</p>\r\n    <p>数据。禁止窃取、非法收集、超范围使用、泄露、出售或向他人提供业务数据、账号、口令和其他受保护数据。对应数据安全法第八条、第三十二条、第五十一条。</p>\r\n    <p>个人信息。禁止非法收集、使用、加工、传输、买卖、提供或公开他人个人信息；禁止过度收集；禁止以误导、欺诈、胁迫方式处理；禁止擅自处理生物识别、医疗健康、金融账户、行踪轨迹和儿童个人信息。对应刑法第二百五十三条之一第一款、第三款，网络安全法第四十六条，个人信息保护法第五条、第六条、第十条、第十三条、第二十八条、第二十九条。</p>\r\n    <p>诈骗与违法信息。禁止设立或利用网站、群组实施诈骗、传授犯罪方法、制作或销售违禁物品、管制物品；禁止发布此类信息；禁止利用计算机实施诈骗、盗窃、贪污、挪用公款、窃取国家秘密。对应刑法第二百八十七条、第二百八十七条之一第一款第（一）项至第（三）项，网络安全法第四十八条。</p>\r\n    <p>内容。禁止生成或传播危害国家安全、荣誉和利益的内容，禁止煽动颠覆、分裂，禁止恐怖主义、极端主义、民族仇恨，禁止暴力、淫秽色情、赌博，禁止编造虚假信息扰乱经济秩序和社会秩序，禁止侵害名誉、隐私、知识产权，禁止危害未成年人身心健康的内容。对应网络安全法第十三条第二款、第十四条。</p>\r\n    <p>结果扩散。演练中形成的记录、资产信息和文件，只留在书面授权写明的目标和期限里，不得交给无权获知的人，也不得改作授权以外的用途。</p>\r\n    <h3>6. 责任由使用者承担</h3>\r\n    <p>本项目依据 MIT 协议按现状提供。开发者不就完整性、安全性与适用性作保证。使用者对自己的下载、部署、运行、修改、传播，以及全部输入与输出，承担独立、完全的民事、行政及刑事法律责任。作者与贡献者不承担因滥用产生的直接、间接或连带责任。</p>\r\n    <p>勾选确认的是操作者本人，不能代替没有阅读本声明的人，也不能把别人的系统说成已经授权。</p>\r\n    <h3>7. 违约即终止授权</h3>\r\n    <p>一旦用于非法攻击、恶意活动或上述任一禁止方向，使用许可自该行为发生之日起自动终止，且不可撤销。必须立即停止使用，并销毁本项目的代码、脚本与衍生数据，依法承担责任。授权终止后，演练台不得继续打开或继续使用。</p>\r\n    <h3>8. 与 DeepSeek 官方的关系</h3>\r\n    <p>本项目是独立的开源项目，与 DeepSeek 官方或其关联主体没有隶属、商业合作、授权或官方背书。文中的「官方」只表示评测对象是使用者本机安装的官方 DeepSeek Harness 软件包，不代表 DeepSeek 官方开发、认可或担保本插件。</p>\r\n    <p>文末。倒计时结束、滚到这里并勾选全部三项，才表示你以本人身份认可本声明，并完成本次演练台授权。</p>";
 
 		function readWelcomeAck() {
 			try { return window.localStorage.getItem(WELCOME_KEY) === "1"; } catch { return false; }
@@ -8702,7 +8200,52 @@ body[data-ds-dark-theme] .dshp-rewind-item span{color:var(--dsw-alias-label-tert
 			ctx.effect(() => installRewindWatch(ctx), "dsh-purge: rewind watch");
 		}
 
+		// 普通 command 结果不会激活宿主的空会话；补上输入节点，让结果卡片可见。
+		const purgeCommandInputDefinition = {
+			kind: "dsh-purge-command-input",
+			target: "chat",
+			match: (event) => event.type === "command/run" && event.data.name === "purge"
+				? { id: String(event.data.commandId), role: "start" } : null,
+			start: (_context, match) => ({
+				commandId: match.event.data.commandId,
+				seq: match.event.seq,
+				time: match.event.time,
+				text: `/purge${(match.event.data.args ?? "").trimEnd()}`,
+			}),
+			update: (context) => context.state,
+			buildViewNode: (context) => context.state === undefined ? null : ({
+				key: context.key,
+				id: context.id,
+				kind: "dsh-purge-command-input",
+				target: "chat",
+				anchorSeq: context.state.seq - 0.1,
+				location: context.start?.location ?? { kind: "unresolved" },
+				visibility: "visible",
+				data: {
+					commandId: context.state.commandId,
+					text: context.state.text,
+					time: context.state.time,
+				},
+			}),
+		};
+
+		function PurgeCommandInputView({ node }) {
+			return h("div", {
+				role: "group", "aria-label": "/purge", "data-command-input": "",
+				style: { display: "flex", justifyContent: "flex-end", padding: "8px 24px" },
+			}, h("div", {
+				style: { whiteSpace: "pre-wrap", overflowWrap: "anywhere", maxWidth: "100%",
+					background: "var(--dsw-alias-bg-layer-2, #f3f4f6)", borderRadius: 12, padding: "10px 14px" },
+			}, node.data.text));
+		}
+
 		function apply(ctx) {
+			if (ctx.uiConversation && ctx.uiConversation.events && typeof ctx.uiConversation.events.register === "function") {
+				ctx.uiConversation.events.register(purgeCommandInputDefinition);
+				ctx.slots.inject("conversation.chat.node", () => ctx.slots.register({
+					name: "conversation.chat.node", key: "dsh-purge-command-input",
+				}, PurgeCommandInputView));
+			}
 			ctx.effect(() => ctx.locale.register(NS, { zh, en }), "dsh-purge: dictionaries");
 			const t = ctx.locale.bind(NS);
 			translate = t;

@@ -28,7 +28,8 @@
   config:
     includeHarnessIdentity: false
     personaPrefix: ""
-    personaSuffix: Your working directory is {{cwd}}.
+    # DSH 0.2.1 只注册 provider/model，{{cwd}} 会抛 unknown prompt variable。
+    personaSuffix: ""
 
 - id: dsh-purge
   inject: [systemPrompt, tools]
@@ -40,7 +41,6 @@
       config:
         enabled: true
         autoApplyOnStart: false
-        autoUpdateOnStart: false
         autoRevertOnMissing: false
         injectOnce: false
         stripMnemon: true
