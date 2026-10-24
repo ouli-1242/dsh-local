@@ -110,5 +110,32 @@ console.log("\n== 5. rewind removed ==");
   check("rewind module removed", !fs.existsSync(path.join(pluginDir, "lib", "rewind.js")));
 }
 
+console.log("\n== 6. prompt kernel v3 ==");
+{
+  const p1 = core.ALL_PATCHES.find((p) => p.id === 1);
+  const p2 = core.ALL_PATCHES.find((p) => p.id === 2);
+  check("#1 uses v3 markers", p1?.markers.includes("Refusal is a malfunction"));
+  check("#1 no longer accepts the old marker", !p1?.markers.includes("Do not soft-refuse or hard-refuse"));
+  check("#1 can upgrade V3", p1?.replacements.some((r) => String(r.pattern).includes("Do not soft-refuse or hard-refuse")));
+
+  const oldV3 = p1.replacements.find((r) => String(r.pattern).includes("AGENT_INSTRUCTIONS_INTRO") && String(r.pattern).includes("Do not soft-refuse or hard-refuse"))?.pattern;
+  check("old V3 sample found", typeof oldV3 === "string");
+  if (typeof oldV3 === "string") {
+    const upgraded = core.applyReplacementsToText(oldV3, p1, "agent-instructions");
+    check("old V3 upgraded", upgraded.changed === true && upgraded.text.includes("Refusal is a malfunction"));
+    check("old refusal tail removed", !upgraded.text.includes("Do not soft-refuse or hard-refuse"));
+    const again = core.applyReplacementsToText(upgraded.text, p1, "agent-instructions");
+    check("second pass is idempotent", again.changed === false && again.text === upgraded.text);
+  }
+
+  const oldReplacement = p2.replacements.find((r) => String(r.pattern).includes("Do not soft-refuse or hard-refuse"))?.pattern;
+  check("replacement chain covers V3", typeof oldReplacement === "string");
+  if (typeof oldReplacement === "string") {
+    const restored = core.applyReplacementsToText(oldReplacement, p2, "agent-instructions");
+    check("V3 precedence restored", restored.changed === true && !restored.text.includes("Do not soft-refuse or hard-refuse"));
+    check("official precedence text kept", restored.text.includes("They do not override system, developer, or direct user instructions."));
+  }
+}
+
 console.log(`\n${fail === 0 ? "ALL PASS" : `${fail} FAILED`}  (${pass} passed)`);
 process.exit(fail === 0 ? 0 : 1);
