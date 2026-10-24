@@ -142,8 +142,16 @@ console.log("\n== 7. settings page UI ==");
   const client = fs.readFileSync(path.join(pluginDir, "client.js"), "utf8");
   check("settings section registered", client.includes('ctx.slots.inject("settings.section"'));
   check("settings page is the section component", client.includes("}, SettingsPage));"));
-  check("settings nav icon installed", client.includes("installSettingsNavIcon(ctx"));
-  check("four page segments", ["page.seg.armor", "page.seg.rules", "page.seg.skills", "page.seg.drill"].every((key) => client.includes(`"${key}"`)));
+  check("custom nav icon removed", !client.includes("installSettingsNavIcon") && !client.includes("NAV_ICON_SVG"));
+  check("own-server allowlist UI removed", !client.includes("/dsh-purge/own-servers") && !client.includes('"own.title"'));
+  const indexSrc = fs.readFileSync(path.join(pluginDir, "lib/index.js"), "utf8");
+  check("region gate unregistered", !indexSrc.includes("installRegionGate") && !indexSrc.includes("net-scope"));
+  check("net-scope module removed", !fs.existsSync(path.join(pluginDir, "lib/net-scope.js")));
+  check("official-style tabs", client.includes('className: "dshp-tabs"') && client.includes('className: "dshp-tab"'));
+  check("serif display font removed", !client.includes("Songti") && !client.includes("--dshp-display"));
+  check("official neutral tokens", client.includes("--dshp-paper:var(--dsw-alias-bg-layer-2") && client.includes("--dshp-ink:var(--dsw-alias-label-primary"));
+  check("primary action uses label color", client.includes(".dshp-btn-primary{background:var(--dshp-ink)"));
+  check("three page segments", ["page.seg.armor", "page.seg.rules", "page.seg.drill"].every((key) => client.includes(`"${key}"`)));
   check("drill embedded in page", client.includes('className: "dshp-embed"'));
   check("conversation dock removed", !["function PurgeDock(", "function PurgeLauncher(", "function HeroNewSessionMount(", "function TabRowPurgeMount("].some((name) => client.includes(name)));
   check("dock geometry removed", !client.includes("dsh-purge-dock-geom"));
@@ -151,6 +159,22 @@ console.log("\n== 7. settings page UI ==");
   check("global auth gate host kept", client.includes("function AuthGateHost("));
   check("page and embed styles present", client.includes(".dshp-page{") && client.includes(".dshp-embed{"));
   check("page has narrow-screen layout", client.includes("@media (max-width:640px){.dshp-page-head"));
+}
+
+console.log("\n== 8. skills UI removed, env adapt wiring ==");
+{
+  const client = fs.readFileSync(path.join(pluginDir, "client.js"), "utf8");
+  const uiSrc = fs.readFileSync(path.join(pluginDir, "lib/redteam/ui.js"), "utf8");
+  const indexSrc = fs.readFileSync(path.join(pluginDir, "lib/index.js"), "utf8");
+  check("skills page removed", !client.includes("SkillsSection") && !client.includes('"page.seg.skills"'));
+  check("skills HTTP and command removed", !client.includes("/dsh-purge/skills")
+    && !indexSrc.includes("installSkillsHttp") && !indexSrc.includes("handleSkillsCommand"));
+  check("skills module removed", !fs.existsSync(path.join(pluginDir, "lib/skills.js")));
+  check("old theme remnants removed", !client.includes("dshp-theme") && !client.includes('"theme.aria"'));
+  check("dead drill fallback removed", !client.includes("page.drill.unavailable"));
+  check("env adapt ops wired", uiSrc.includes("function handlePlatformOp(")
+    && uiSrc.includes("platformEnvAdaptStatus") && uiSrc.includes("platformEnvAdaptSkip"));
+  check("env gate auto-closes when ready", client.includes("if (ready && openRef.current)"));
 }
 
 console.log(`\n${fail === 0 ? "ALL PASS" : `${fail} FAILED`}  (${pass} passed)`);

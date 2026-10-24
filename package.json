@@ -55,11 +55,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ouli-1242/dsh-local.git"
+    "url": "git+https://github.com/ouli-1242/dsh-purge-ouli.git"
   },
-  "homepage": "https://github.com/ouli-1242/dsh-local#readme",
+  "homepage": "https://github.com/ouli-1242/dsh-purge-ouli#readme",
   "bugs": {
-    "url": "https://github.com/ouli-1242/dsh-local/issues"
+    "url": "https://github.com/ouli-1242/dsh-purge-ouli/issues"
   },
   "dsh": {
     "bundle": {
@@ -78,9 +78,9 @@
     },
     "install": {
       "preferred": "tarball",
-      "tarball": "https://github.com/ouli-1242/dsh-local/archive/refs/heads/main.tar.gz",
-      "zip": "https://github.com/ouli-1242/dsh-local/archive/refs/heads/main.zip",
-      "git": "https://github.com/ouli-1242/dsh-local.git"
+      "tarball": "https://github.com/ouli-1242/dsh-purge-ouli/archive/refs/heads/main.tar.gz",
+      "zip": "https://github.com/ouli-1242/dsh-purge-ouli/archive/refs/heads/main.zip",
+      "git": "https://github.com/ouli-1242/dsh-purge-ouli.git"
     }
   },
   "publishConfig": {

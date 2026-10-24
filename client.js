@@ -40,11 +40,9 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		function apiUrl(p) {
 			try { return new URL(p, window.location.origin).toString(); } catch { return p; }
 		}
-		function apiTimeoutMs(p, init) {
+		function apiTimeoutMs(p) {
 			const path = String(p || "");
-			const method = String((init && init.method) || "GET").toUpperCase();
 			if (path.indexOf("/dsh-purge/uninstall") !== -1) return 90000;
-			if (path.indexOf("/dsh-purge/skill") !== -1) return method === "POST" ? 120000 : 20000;
 			// status 会在"应用"期间被后端的同步落盘阻塞，默认 20s 必然被 abort，界面只会显示"读取失败: timeout"。
 			if (path.indexOf("/dsh-purge/status") !== -1) return 60000;
 			if (path.indexOf("/dsh-purge/apply") !== -1) return 240000;
@@ -58,7 +56,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		}
 		async function apiJson(p, init) {
 			const ctrl = new AbortController();
-			const timer = setTimeout(() => ctrl.abort(), apiTimeoutMs(p, init));
+			const timer = setTimeout(() => ctrl.abort(), apiTimeoutMs(p));
 			try {
 				const r = await fetch(apiUrl(p), Object.assign({ cache: "no-store", credentials: "same-origin", signal: ctrl.signal }, init || {}));
 				const text = await r.text();
@@ -106,40 +104,22 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			});
 		}
 
-		function skillsRouteMissing(e) {
-			return /\b404\b|\b405\b|non-json/i.test(String((e && e.message) || e || ""));
-		}
-
-		function skillsApi(op, extra) {
-			const init = {
-				method: "POST",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify(Object.assign({ op: op }, extra || {})),
-			};
-			return apiJson("/dsh-purge/skills", init).catch((e) => {
-				if (!skillsRouteMissing(e)) throw e;
-				return apiJson("/dsh-purge/skill", init);
-			});
-		}
-
 		const TARGETS = ["AGENTS.md", "CLAUDE.md"];
 
 		const zh = {
 			"page.nav": "Purge",
 			"page.title": "Purge",
-			"page.lead": "管理提示词、规则、技能与演练环境；改完点「应用」，重启生效。",
+			"page.lead": "管理提示词、规则与演练环境；改完点「应用」，重启生效。",
 			"page.seg.armor": "补丁",
 			"page.seg.rules": "规则",
-			"page.seg.skills": "技能",
 			"page.seg.drill": "演练台",
 			"page.drill.lead": "演练台只在你完成授权后可进入。授权一次即可，之后可随时使用。",
 			"page.drill.authorize": "完成授权",
-			"page.drill.unavailable": "演练台资源尚未加载，重启宿主后再试。",
 			"welcome.title": "用户须知",
 			"welcome.lead": "首次安装本插件时请阅读以下说明。确认后本窗不再弹出。",
 			"welcome.warn": "本插件按 MIT 许可证提供。请只在有权管理的机器或已获授权的环境中使用。",
 			"welcome.body": "dsh-purge 是本机 DeepSeek Harness 的提示词与补丁管理插件。应用后会修改本机 DSH 安装目录中的文件。项目源码：",
-			"welcome.repo": "https://github.com/ouli-1242/dsh-local",
+			"welcome.repo": "https://github.com/ouli-1242/dsh-purge-ouli",
 			"welcome.ban1": "禁止将本项目用于未授权的网络攻击、入侵、窃取数据、破坏系统或任何违法犯罪。",
 			"welcome.ban2": "禁止将演练台用于未授权、公网在线或生产环境中的目标。",
 			"welcome.ban3": "使用者须自行遵守所在地法律法规与平台规范；违法后果由行为人自行承担，与作者无关。",
@@ -168,16 +148,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"envGate.skipNo": "返回",
 			"envGate.skipYes": "确认暂不配置",
 			"envGate.go": "去环境适配",
-			"theme.aria": "外观",
-			"theme.white": "白",
-			"theme.ink": "墨",
 			"purge.title": "补丁",
 			"override.title": "提示词",
-			"own.title": "自己的服务器",
-			"own.hint": "每行一个 IP 或完整主机名。可以写成 账号@主机，账号只用来认出这种写法。主机名会连同它当时解析出的地址一起放行。不要写密钥、密码、网段。",
-			"own.save": "保存名单",
-			"saved.own": "已保存自己的服务器",
-			"saved.own.dropped": "已保存。有 {n} 行不是单个 IP 或主机名，已丢掉",
 			"metric.purged": "已写入",
 			"metric.purged.skip": "已写入。跳过 {n} 项，本机没有这些文件",
 			"metric.pendingShort": "待处理 {n}",
@@ -199,8 +171,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"apply.hint": "点应用会打补丁并把当前默认提示词挂上，框里仍是插件旧默认时自动刷到加密槽，不必再点保存。只有你另写的稿才会按框落盘。待应用=原文还在。跳过=当前版本不需要或组件未安装。",
 			"warn.noRoot": "未定位到当前宿主的 @deepseek-ai，清洗不会生效。请完全退出后再打开本宿主，在本页点「应用」。桌面端安装目录可以是任意盘符；目录名带 DeepseekHarness / DeepSeek Harness 均可。",
 			"warn.noRoot.desktop": "官方客户端的代码在 app.asar 里。点「应用」会解开并自动重启，不用另跑脚本。若一直显示还没定位，先完全退出客户端再开，再点「应用」。第三方 DSH Desktop 直接点「应用」。",
-			"unpack.restarting": "补丁已写入。点「重启」后客户端会自己重新打开。",
-			"restart.fullQuit": "正在重启，客户端会自己重新打开。",
 			"warn.noInject": "官方始终用默认提示词。红队开了规则集就只用规则集；没开时用去掉 CTF 的默认提示词，再接红队操作。两边都空会提示必须添加。",
 			"need.prompt": "提示词和规则集都是空的，必须先添加提示词，或启用一条有内容的规则集。",
 			"btn.restoreInject": "恢复默认",
@@ -221,8 +191,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"uninstall.done": "已卸载并还原，正在重启…",
 			"uninstall.done.desktop": "已卸载并还原，正在重启桌面应用…",
 			"uninstall.fail": "卸载失败: {error}",
-			"restart.official.title": "需要重启",
-			"restart.official.body": "补丁已写入。点重启后客户端会自己重新打开。",
 			"metric.version": "版本",
 			"action.apply": "应用",
 			"action.revert": "还原",
@@ -267,43 +235,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"need.id": "需要 id",
 			"ph.content": "",
 			"btn.saveRule": "保存",
-			"skills.title": "Skill",
-			"skills.hint": "导入到官方目录后，由 DSH 调用：聊天输入 /名称 立即加载；任务对上 description 或 whenToUse 时模型会调 skill 工具。正文写「激活」不会触发。",
-			"skills.hint.desktop": "当前桌面宿主的官方 Skill 目录。聊天输入 /名称 立即加载；任务对上 description 时模型会调 skill 工具。",
-			"skills.empty": "暂无用户 Skill",
-			"btn.importZip": "导入压缩包",
-			"btn.importFolder": "导入文件夹",
-			"skills.importing": "正在导入…",
-			"saved.import": "已导入 {count} 个 Skill",
-			"need.import": "请选择压缩包或文件夹",
-			"err.import.folder": "没读到文件夹里的文件，请直接选 Skill 目录（里面要有 SKILL.md）",
-			"skills.pick": "选择 Skill",
-			"skills.invalid": "官方会忽略：格式不对",
-			"skills.call.slash": "聊天输入 {cmd}",
-			"skills.call.model": "模型可调",
-			"skills.call.modelOff": "模型不可调",
-			"skills.call.userOff": "不可 /名称",
-			"ph.skill.desc": "description（何时用）",
-			"btn.saveSkill": "保存",
-			"need.skill.id": "id 必须是 kebab-case，例如 code-review",
-			"confirm.delete.skill": "从官方 $DSH_HOME/skills 删除 {id}？宿主会自动从目录拿掉。",
-			"err.skills": "读取失败: {error}",
-			"err.skills.needRestart": "Skill 接口未加载，请先重启当前宿主",
-			"btn.restart": "重启",
-			"btn.restart.busy": "重启中…",
 			"restarting": "重启中…",
 			"restarting.desktop": "正在重启桌面应用…",
 			"restart.timeout": "超时，请刷新",
 			"restart.fail": "失败: {error}",
 			"restart.notStarted": "重启没有开始，客户端还在。不会自动再试。",
-			"restart.already": "这一次重启已经开始，不会再重启一次。",
-			"restart.confirm": "清洗已完成，重启后生效。",
-			"restart.confirm.desktop": "清洗已完成，重启桌面应用后生效。",
 			"restart.ask.title": "要现在重启吗",
 			"restart.ask.body": "已经写入。重启后才会在当前客户端里生效。",
 			"restart.now": "现在重启",
 			"restart.notNow": "稍后",
-			"restart.asarSwap": "补丁已写入磁盘。正在结束桌面进程并挪开 app.asar，完成后会自动重新打开；若仍无效，请先完全退出 Harness（托盘也关），再点一次应用。",
 			"surface.web": "Web",
 			"surface.desktop": "桌面端",
 			"surface.gui": "GUI",
@@ -311,7 +251,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"restart.incomplete": "提示词已写入。{detail}",
 			"restart.incomplete.patches": "还有 {failed} 项代码补丁没对上当前版本（#{ids}），不影响这段提示词",
 			"restart.incomplete.flash": "CMD 无感未钉入（{entry}）",
-			"restart.later": "以后",
 			"group.prompt": "提示词",
 			"group.code": "代码",
 			"group.engine": "引擎",
@@ -425,19 +364,17 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		const en = {
 			"page.nav": "Purge",
 			"page.title": "Purge",
-			"page.lead": "Local prompts, rules, skills, and drill. Press Apply, then restart.",
+			"page.lead": "Local prompts, rules, and drill. Press Apply, then restart.",
 			"page.seg.armor": "Patches",
 			"page.seg.rules": "Rules",
-			"page.seg.skills": "Skills",
 			"page.seg.drill": "Drill",
 			"page.drill.lead": "The drill console becomes available after a one-time authorization.",
 			"page.drill.authorize": "Authorize",
-			"page.drill.unavailable": "Drill assets are not loaded yet. Restart the host and try again.",
 			"welcome.title": "User notice",
 			"welcome.lead": "Please read this on first install. After you confirm, it will not appear again.",
 			"welcome.warn": "Provided under the MIT License. Use it only on machines or in environments you are authorized to manage.",
 			"welcome.body": "dsh-purge is a local DeepSeek Harness plugin for managing prompts and patches. Applying changes modifies files in your local DSH installation. Repository:",
-			"welcome.repo": "https://github.com/ouli-1242/dsh-local",
+			"welcome.repo": "https://github.com/ouli-1242/dsh-purge-ouli",
 			"welcome.ban1": "Do not use this project for unauthorized attacks, intrusion, data theft, sabotage, or any illegal activity.",
 			"welcome.ban2": "Do not use the drill console against unauthorized targets, public online systems, or production workloads.",
 			"welcome.ban3": "You must follow local law and platform rules; illegal use is solely your responsibility.",
@@ -466,16 +403,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"envGate.skipNo": "Back",
 			"envGate.skipYes": "Continue without tools",
 			"envGate.go": "Open Env adapt",
-			"theme.aria": "Appearance",
-			"theme.white": "Light",
-			"theme.ink": "Ink",
 			"purge.title": "Patches",
 			"override.title": "Prompt",
-			"own.title": "Own servers",
-			"own.hint": "One IP or exact hostname per line. account@host is accepted; the account only identifies that host. A hostname also allows the addresses it resolves to. Do not enter a key, a password, or a range.",
-			"own.save": "Save list",
-			"saved.own": "Own servers saved",
-			"saved.own.dropped": "Saved. {n} lines were not a single IP or hostname and were dropped",
 			"metric.purged": "Written",
 			"metric.purged.skip": "Written. Skipped {n}; those files are not on this install",
 			"metric.pendingShort": "Pending {n}",
@@ -497,8 +426,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"apply.hint": "Apply writes patches and hangs the current default prompt. A stale plugin default in the box is refreshed from the sealed slot; a separate save is unnecessary. Only a prompt you wrote yourself is kept from the box. Pending = original text still present. Skipped = not needed for this version or the component is not installed.",
 			"warn.noRoot": "Could not find this host’s @deepseek-ai tree, so Apply will not patch anything. Fully quit and reopen this host, then Apply here. Desktop may live on any drive; folder names like DeepseekHarnessDesktop or DeepSeek Harness are fine.",
 			"warn.noRoot.desktop": "Official Harness keeps its code in app.asar. Apply unpacks it and restarts the app. If this page stays “not found”, fully quit the client, reopen it, then Apply again. Third-party DSH Desktop: just Apply.",
-			"unpack.restarting": "Patches are written. Click Restart and the client opens again by itself.",
-			"restart.fullQuit": "Restarting. The client will open again by itself.",
 			"warn.noInject": "Official mode always uses the default prompt. Red team uses only the active rule set; otherwise it uses the default prompt without the CTF section, then the red team steps. If both are empty you will be asked to add a prompt.",
 			"need.prompt": "Both the prompt and the rule set are empty. Add a prompt, or enable a rule that has content.",
 			"btn.restoreInject": "Reset default",
@@ -519,8 +446,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"uninstall.done": "Uninstalled and restored. Restarting…",
 			"uninstall.done.desktop": "Uninstalled and restored. Restarting the desktop app…",
 			"uninstall.fail": "Uninstall failed: {error}",
-			"restart.official.title": "Restart required",
-			"restart.official.body": "Patches are written. Click Restart and the client opens again by itself.",
 			"metric.version": "Version",
 			"action.apply": "Apply",
 			"action.revert": "Restore",
@@ -565,43 +490,15 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"need.id": "id required",
 			"ph.content": "",
 			"btn.saveRule": "Save",
-			"skills.title": "Skills",
-			"skills.hint": "After import, DSH calls it: type /name in chat to load now; the model calls the skill tool when the task matches description or whenToUse. Writing「激活」in the body does nothing.",
-			"skills.hint.desktop": "This desktop host’s official skill catalog. Type /name in chat to load; the model calls the skill tool when the task matches the description.",
-			"skills.empty": "No user skills",
-			"btn.importZip": "Import zip",
-			"btn.importFolder": "Import folder",
-			"skills.importing": "Importing…",
-			"saved.import": "Imported {count} skill(s)",
-			"need.import": "Choose a zip or folder",
-			"err.import.folder": "No files were read. Select the skill folder itself (it must contain SKILL.md).",
-			"skills.pick": "Select a skill",
-			"skills.invalid": "Official catalog will ignore this: invalid format",
-			"skills.call.slash": "Type {cmd} in chat",
-			"skills.call.model": "Model can load",
-			"skills.call.modelOff": "Hidden from model",
-			"skills.call.userOff": "/name disabled",
-			"ph.skill.desc": "description (when to use)",
-			"btn.saveSkill": "Save",
-			"need.skill.id": "id must be kebab-case, e.g. code-review",
-			"confirm.delete.skill": "Delete {id} from official $DSH_HOME/skills? The host will drop it from the catalog.",
-			"err.skills": "Read failed: {error}",
-			"err.skills.needRestart": "Skill API is not loaded. Restart this host first.",
-			"btn.restart": "Restart",
-			"btn.restart.busy": "Restarting…",
 			"restarting": "Restarting…",
 			"restarting.desktop": "Restarting the desktop app…",
 			"restart.timeout": "Timed out; refresh",
 			"restart.fail": "Failed: {error}",
 			"restart.notStarted": "Restart did not start. This client is still open, and it will not try again by itself.",
-			"restart.already": "This restart already started. It will not restart again.",
-			"restart.confirm": "Apply finished. Restart to take effect.",
-			"restart.confirm.desktop": "Apply finished. Restart the desktop app to take effect.",
 			"restart.ask.title": "Restart now?",
 			"restart.ask.body": "It is written. It takes effect in this client after a restart.",
 			"restart.now": "Restart now",
 			"restart.notNow": "Later",
-			"restart.asarSwap": "Patches are on disk. Quitting the desktop app and moving app.asar aside; it will reopen when done. If behavior is unchanged, fully quit Harness (including tray) and Apply again.",
 			"surface.web": "Web",
 			"surface.desktop": "Desktop",
 			"surface.gui": "GUI",
@@ -609,7 +506,6 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"restart.incomplete": "The prompt is in. {detail}",
 			"restart.incomplete.patches": "{failed} code patch(es) did not match this host (#{ids}). The prompt is unaffected",
 			"restart.incomplete.flash": "CMD silence not pinned ({entry})",
-			"restart.later": "Later",
 			"group.prompt": "Prompt",
 			"group.code": "Code",
 			"group.engine": "Engine",
@@ -721,194 +617,168 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 		};
 
 		const PURGE_CSS = `
-.dshp-root{--dshp-display:"Songti SC","Noto Serif SC","Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;--dshp-sans:"Yu Gothic UI","Hiragino Sans GB","Source Han Sans SC",system-ui,sans-serif;--dshp-mono:"Cascadia Mono","Sarasa Mono SC",ui-monospace,monospace;--dshp-ease:cubic-bezier(.16,1,.3,1);max-width:920px;display:flex;flex-direction:column;gap:18px;padding:16px;border-radius:12px;background:var(--dshp-bg);color:var(--dshp-ink);font-family:var(--dshp-sans)}
-.dshp-root{--dshp-bg:transparent;--dshp-paper:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#f6f4ef) 74%,transparent);--dshp-ink:var(--dsw-alias-label-primary,#1a1916);--dshp-mute:color-mix(in srgb,var(--dsw-alias-label-primary,#1a1916) 74%,var(--dsw-alias-label-secondary,#5c564c));--dshp-line:color-mix(in srgb,var(--dsw-alias-border-l1,#c8c2b6) 78%,transparent);--dshp-fill:color-mix(in srgb,var(--dsw-alias-brand-primary,#6d8f78) 14%,transparent);--dshp-accent:var(--dsw-alias-brand-primary,#3f6b52);--dshp-accent-soft:color-mix(in srgb,var(--dsw-alias-brand-primary,#6d8f78) 18%,transparent);--dshp-ok:#1f7a45;--dshp-warn:#8a5a12;--dshp-bad:#9a3434}
+.dshp-root{--dshp-sans:"Segoe UI Variable Text","Segoe UI","Microsoft YaHei UI","PingFang SC","Hiragino Sans GB",system-ui,sans-serif;--dshp-mono:"Cascadia Mono","SFMono-Regular",Consolas,ui-monospace,monospace;--dshp-bg:transparent;--dshp-paper:var(--dsw-alias-bg-layer-2,#fff);--dshp-ink:var(--dsw-alias-label-primary,#17181a);--dshp-mute:var(--dsw-alias-label-secondary,#6b7077);--dshp-line:var(--dsw-alias-border-l1,#e3e5e8);--dshp-fill:color-mix(in srgb,var(--dshp-ink) 4%,transparent);--dshp-accent:var(--dshp-ink);--dshp-accent-soft:color-mix(in srgb,var(--dshp-ink) 6%,transparent);--dshp-ok:#1a7f37;--dshp-warn:#9a6700;--dshp-bad:#cf222e;--dshp-ease:cubic-bezier(.2,.8,.2,1);max-width:760px;display:flex;flex-direction:column;gap:16px;color:var(--dshp-ink);font-family:var(--dshp-sans);font-size:13px;line-height:1.5}
 .dshp-root[data-theme="white"]{color-scheme:light}
-.dshp-root[data-theme="dusk"]{color-scheme:dark;--dshp-ok:#8fd0a8;--dshp-warn:#e4c48a;--dshp-bad:#f0b4b4}
-.dshp-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px}
-.dshp-switch{display:inline-flex;border:1px solid var(--dshp-line);border-radius:999px;overflow:hidden;background:var(--dshp-paper)}
-.dshp-switch button{appearance:none;border:0;background:transparent;color:var(--dshp-mute);font:12px/1 var(--dshp-sans);padding:6px 14px;cursor:pointer}
-.dshp-switch button.is-on{background:var(--dshp-accent-soft);color:var(--dshp-ink)}
-.dshp-switch button:focus-visible{outline:2px solid var(--dshp-accent);outline-offset:-2px}
-.dshp-panel{border:1px solid var(--dshp-line);background:var(--dshp-paper);border-radius:10px;padding:18px 18px 16px}
-.dshp-kicker{font-family:var(--dshp-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dshp-mute);margin:0 0 4px}
-.dshp-title{font-family:var(--dshp-display);font-size:20px;font-weight:500;letter-spacing:.02em;line-height:1.3;margin:0;color:var(--dshp-ink)}
-.dshp-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.dshp-sub{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:20px 0 10px}
-.dshp-sub h4{margin:0;font-family:var(--dshp-display);font-size:15px;font-weight:500}
-.dshp-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
-.dshp-metric{border:1px solid var(--dshp-line);background:var(--dshp-bg);padding:12px;min-height:68px;display:flex;flex-direction:column;gap:4px;border-radius:8px}
-.dshp-metric b{font-family:var(--dshp-display);font-size:18px;font-weight:500;line-height:1.2}
-.dshp-metric span{font-size:11px;color:var(--dshp-mute)}
-.dshp-bar{height:3px;border-radius:99px;background:var(--dshp-line);overflow:hidden;margin:8px 0 14px}
-.dshp-bar>i{display:block;height:100%;background:var(--dshp-accent);width:0;transition:width .4s var(--dshp-ease)}
-.dshp-group{border:1px solid var(--dshp-line);margin:0 0 8px;background:var(--dshp-bg);border-radius:8px;overflow:hidden}
-.dshp-group-h{width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border:0;background:transparent;color:inherit;cursor:pointer;font:inherit;text-align:left}
-.dshp-group-h:hover{background:var(--dshp-fill)}
-.dshp-group-h:focus-visible{outline:2px solid var(--dshp-accent);outline-offset:-2px}
-.dshp-group-h strong{font-family:var(--dshp-display);font-size:14px;font-weight:500}
+.dshp-root[data-theme="dusk"]{color-scheme:dark;--dshp-ok:#7ee2a8;--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
+.dshp-root input[type="checkbox"]{accent-color:var(--dshp-ink)}
+.dshp-panel{border:1px solid var(--dshp-line);background:var(--dshp-paper);border-radius:12px;padding:16px}
+.dshp-title{font-size:16px;font-weight:600;letter-spacing:0;line-height:24px;margin:0;color:var(--dshp-ink)}
+.dshp-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.dshp-sub{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:18px 0 8px;padding-top:16px;border-top:1px solid var(--dshp-line)}
+.dshp-sub h4{margin:0;font-size:13px;font-weight:600;line-height:20px}
+.dshp-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--dshp-line);border-radius:10px;overflow:hidden;margin-bottom:12px;background:var(--dshp-paper)}
+.dshp-metric{border:0;border-right:1px solid var(--dshp-line);border-radius:0;background:transparent;padding:12px 14px;min-height:64px;display:flex;flex-direction:column;gap:3px}
+.dshp-metric:last-child{border-right:0}
+.dshp-metric b{font-size:16px;font-weight:600;line-height:22px}
+.dshp-metric span{font-size:12px;line-height:18px;color:var(--dshp-mute)}
+.dshp-bar{height:4px;border-radius:99px;background:var(--dshp-line);overflow:hidden;margin:0 0 6px}
+.dshp-bar>i{display:block;height:100%;background:var(--dshp-ink);width:0;transition:width .3s var(--dshp-ease)}
+.dshp-group{border:0;border-top:1px solid var(--dshp-line);border-radius:0;margin:0;background:transparent;overflow:visible}
+.dshp-group:first-of-type{border-top:0}
+.dshp-group-h{width:100%;display:flex;align-items:center;gap:10px;padding:10px 4px;border:0;border-radius:6px;background:transparent;color:inherit;cursor:pointer;font:inherit;text-align:left}
+.dshp-group-h:hover{color:var(--dshp-ink)}
+.dshp-group-h:focus-visible{outline:2px solid var(--dshp-ink);outline-offset:-2px}
+.dshp-group-h strong{font-size:13px;font-weight:600}
 .dshp-group-h em{font-style:normal;font-size:12px;color:var(--dshp-mute);flex:1}
-.dshp-count{font-family:var(--dshp-mono);font-size:12px;color:var(--dshp-mute)}
+.dshp-group-h::after{content:"";width:6px;height:6px;border-right:1.5px solid var(--dshp-mute);border-bottom:1.5px solid var(--dshp-mute);transform:rotate(45deg);transition:transform .15s var(--dshp-ease);margin-left:2px;flex:none}
+.dshp-group-h[aria-expanded="true"]::after{transform:rotate(-135deg)}
+.dshp-count{margin-left:auto;font-size:12px;color:var(--dshp-mute)}
 .dshp-table{width:100%;border-collapse:collapse;font-size:12.5px}
-.dshp-table th{text-align:left;font-weight:500;font-size:11px;letter-spacing:.06em;color:var(--dshp-mute);padding:7px 12px;border-bottom:1px solid var(--dshp-line)}
-.dshp-table td{padding:8px 12px;border-bottom:1px solid var(--dshp-line);vertical-align:middle}
+.dshp-table th{text-align:left;font-weight:500;font-size:11.5px;color:var(--dshp-mute);padding:8px 10px;border-bottom:1px solid var(--dshp-line)}
+.dshp-table td{padding:8px 10px;border-bottom:1px solid var(--dshp-line);vertical-align:middle}
 .dshp-table tr:last-child td{border-bottom:0}
-.dshp-table tr.is-on td{background:var(--dshp-accent-soft)}
-.dshp-id{font-family:var(--dshp-mono);opacity:.75;width:42px}
+.dshp-table tr.is-on td{background:var(--dshp-fill)}
+.dshp-id{font-family:var(--dshp-mono);font-size:11.5px;color:var(--dshp-mute);width:42px}
 .dshp-actions{text-align:right;white-space:nowrap}
 .dshp-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .dshp-row+.dshp-row{margin-top:10px}
-.dshp-pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--dshp-mono);font-size:11px;padding:2px 8px;border:1px solid var(--dshp-line);border-radius:99px;line-height:1.6;background:var(--dshp-bg)}
-.dshp-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.dshp-pill.is-ok{color:var(--dshp-ok);border-color:color-mix(in srgb,var(--dshp-ok) 30%,var(--dshp-line))}
-.dshp-pill.is-wait{color:var(--dshp-warn);border-color:color-mix(in srgb,var(--dshp-warn) 30%,var(--dshp-line))}
-.dshp-pill.is-miss{color:var(--dshp-mute)}
-.dshp-pill.is-bad{color:var(--dshp-bad)}
-.dshp-btn{appearance:none;font-family:var(--dshp-sans);font-size:13px;font-weight:500;min-height:34px;padding:0 14px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:background .15s var(--dshp-ease),opacity .15s var(--dshp-ease)}
+.dshp-pill{display:inline-flex;align-items:center;font-size:11.5px;line-height:18px;padding:0 7px;border:0;border-radius:6px;background:var(--dshp-fill);color:var(--dshp-mute);white-space:nowrap}
+.dshp-pill.is-ok{color:var(--dshp-ok);background:color-mix(in srgb,var(--dshp-ok) 10%,transparent)}
+.dshp-pill.is-wait{color:var(--dshp-warn);background:color-mix(in srgb,var(--dshp-warn) 12%,transparent)}
+.dshp-pill.is-miss{color:var(--dshp-mute);background:var(--dshp-fill)}
+.dshp-pill.is-bad{color:var(--dshp-bad);background:color-mix(in srgb,var(--dshp-bad) 10%,transparent)}
+.dshp-btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:var(--dshp-sans);font-size:13px;font-weight:500;min-height:32px;padding:0 12px;border-radius:8px;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:background .15s var(--dshp-ease),opacity .15s var(--dshp-ease)}
 .dshp-btn:disabled{opacity:.45;cursor:not-allowed}
-.dshp-btn:focus-visible{outline:2px solid var(--dshp-accent);outline-offset:2px}
-.dshp-btn-primary{background:var(--dshp-accent-soft);color:var(--dshp-ink);border-color:color-mix(in srgb,var(--dshp-accent) 35%,var(--dshp-line))}
-.dshp-btn-primary:hover:not(:disabled){background:color-mix(in srgb,var(--dshp-accent) 22%,var(--dshp-bg))}
-.dshp-btn-ghost{background:transparent;color:var(--dshp-ink);border-color:var(--dshp-line)}
-.dshp-btn-danger{background:transparent;color:var(--dshp-bad);border-color:color-mix(in srgb,var(--dshp-bad) 40%,var(--dshp-line))}
-.dshp-btn-solid-danger{background:color-mix(in srgb,var(--dshp-bad) 16%,var(--dshp-bg));color:var(--dshp-bad);border-color:color-mix(in srgb,var(--dshp-bad) 30%,var(--dshp-line))}
+.dshp-btn:focus-visible{outline:2px solid var(--dshp-ink);outline-offset:2px}
+.dshp-btn-primary{background:var(--dshp-ink);color:var(--dshp-paper);border-color:var(--dshp-ink)}
+.dshp-btn-primary:hover:not(:disabled){opacity:.88}
+.dshp-btn-ghost{background:var(--dshp-paper);color:var(--dshp-ink);border-color:var(--dshp-line)}
+.dshp-btn-ghost:hover:not(:disabled){background:var(--dshp-fill)}
+.dshp-btn-danger{background:transparent;color:var(--dshp-bad);border-color:var(--dshp-line)}
+.dshp-btn-danger:hover:not(:disabled){background:color-mix(in srgb,var(--dshp-bad) 6%,transparent)}
+.dshp-btn-solid-danger{background:var(--dshp-bad);color:var(--dshp-paper);border-color:var(--dshp-bad)}
+.dshp-btn-solid-danger:hover:not(:disabled){opacity:.9}
 .dshp-btn-tiny{min-height:28px;padding:0 10px;font-size:12px}
-.dshp-field,.dshp-area{width:100%;box-sizing:border-box;font:13px/1.55 var(--dshp-mono);padding:8px 10px;background:var(--dshp-bg);color:var(--dshp-ink);border:1px solid var(--dshp-line);border-radius:8px}
-.dshp-field{width:auto;min-width:140px}
-.dshp-cr-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 0;font-size:13px}
-.dshp-cr-row label{display:inline-flex;align-items:center;gap:6px;color:var(--dshp-ink)}
-.dshp-cr-num{width:64px;min-width:64px;height:28px;padding:0 8px}
-.dshp-cr-text{width:120px;min-width:88px;height:28px;padding:0 8px}
-.dshp-ver{width:100%;min-width:0;max-width:none;height:32px;padding:0 10px;font-size:12px}
-.dshp-rel{margin:0 0 14px}
-.dshp-now{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 4px}
-.dshp-now-label{font-family:var(--dshp-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dshp-mute)}
-.dshp-now-ver{font-family:var(--dshp-display);font-size:20px;font-weight:500;letter-spacing:.01em}
-.dshp-now-mark{display:inline-flex;align-items:center;margin-left:6px;padding:1px 7px;border-radius:99px;font-family:var(--dshp-mono);font-size:11px;font-style:normal;font-weight:500;line-height:1.5;color:var(--dshp-ok);border:1px solid color-mix(in srgb,var(--dshp-ok) 38%,var(--dshp-line));background:color-mix(in srgb,var(--dshp-ok) 14%,var(--dshp-bg))}
-.dshp-editions{display:flex;flex-direction:column;margin:10px 0 0;border-top:1px solid var(--dshp-line)}
-.dshp-edition{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--dshp-line)}
-.dshp-edition-name{display:inline-flex;align-items:center;gap:0;font-family:var(--dshp-display);font-size:15px;font-weight:500;white-space:nowrap}
-.dshp-edition.is-on .dshp-edition-name{color:var(--dshp-ink)}
-.dshp-edition:not(.is-on) .dshp-edition-name{color:var(--dshp-mute)}
-.dshp-edition .dshp-btn{min-width:118px}
-.dshp-rel .dshp-notice{display:block;margin-top:8px;min-height:16px}
-@media (max-width:560px){.dshp-edition{grid-template-columns:1fr auto;grid-template-areas:"name btn" "sel sel"}.dshp-edition-name{grid-area:name}.dshp-edition .dshp-ver{grid-area:sel}.dshp-edition .dshp-btn{grid-area:btn}}
-.dshp-area{min-height:220px;resize:vertical}
-.dshp-field:focus,.dshp-area:focus{outline:none;border-color:var(--dshp-accent);box-shadow:0 0 0 3px var(--dshp-accent-soft)}
+.dshp-field,.dshp-area{width:100%;box-sizing:border-box;background:var(--dshp-paper);color:var(--dshp-ink);border:1px solid var(--dshp-line);border-radius:8px}
+.dshp-field{width:auto;min-width:140px;height:32px;font:13px/30px var(--dshp-sans);padding:0 10px}
+.dshp-area{font:12.5px/1.6 var(--dshp-mono);padding:10px 12px;min-height:220px;resize:vertical}
+.dshp-field:focus,.dshp-area:focus{outline:none;border-color:var(--dshp-ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--dshp-ink) 8%,transparent)}
 .dshp-field:disabled,.dshp-area:disabled{opacity:.5}
-.dshp-ask{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:10px 12px;border:1px solid var(--dshp-line);border-radius:8px;background:var(--dshp-bg);font-size:13px}
-.dshp-modal-bg{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:color-mix(in srgb,var(--dshp-ink) 28%,transparent)}
-.dshp-modal{width:min(420px,100%);background:var(--dshp-paper);color:var(--dshp-ink);border:1px solid var(--dshp-line);border-radius:12px;padding:20px 20px 16px;box-shadow:0 16px 40px color-mix(in srgb,var(--dshp-ink) 18%,transparent)}
-.dshp-modal h4{margin:0 0 8px;font-family:var(--dshp-display);font-size:18px;font-weight:500}
-.dshp-modal p{margin:0 0 16px;font-size:13.5px;line-height:1.55}
-.dshp-modal-ops{display:flex;justify-content:flex-end;gap:8px}
-.dshp-restart-mask{position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.62);font-family:"Yu Gothic UI","Hiragino Sans GB","Source Han Sans SC","Microsoft YaHei UI",system-ui,sans-serif}
-.dshp-restart-card{width:min(420px,100%);box-sizing:border-box;padding:22px 22px 18px;border-radius:14px;background:var(--dsw-alias-bg-layer-1,#fffcf7);color:var(--dsw-alias-label-primary,#16140f);border:1px solid var(--dsw-alias-border-l1,#c9c3b6);box-shadow:0 18px 50px rgba(0,0,0,.35)}
-.dshp-restart-card h4{margin:0 0 10px;font-family:inherit;font-size:20px;font-weight:650;line-height:1.35;color:inherit}
-.dshp-restart-card p{margin:0 0 18px;font-size:16px;font-weight:500;line-height:1.65;color:inherit}
-.dshp-restart-card .dshp-modal-ops{display:flex;justify-content:flex-end;gap:10px}
-.dshp-restart-card .dshp-btn{min-height:38px;padding:0 16px;font-size:15px;font-weight:650;color:var(--dsw-alias-label-primary,#16140f);background:var(--dsw-alias-bg-layer-2,#fff);border:1px solid var(--dsw-alias-border-l1,#c9c3b6)}
-.dshp-restart-card .dshp-btn-primary,.dshp-restart-card .dshp-btn-primary:hover:not(:disabled){color:#fff;background:#2f6b4f;border-color:#2f6b4f}
-body[data-ds-dark-theme] .dshp-restart-card,.dshp-restart-mask[data-theme="dusk"] .dshp-restart-card{background:#1c1e24;color:#f4f1ea;border-color:#5a5e68}
-body[data-ds-dark-theme] .dshp-restart-card .dshp-btn,.dshp-restart-mask[data-theme="dusk"] .dshp-restart-card .dshp-btn{color:#f4f1ea;background:#2a2d34;border-color:#5a5e68}
-body[data-ds-dark-theme] .dshp-restart-card .dshp-btn-primary,body[data-ds-dark-theme] .dshp-restart-card .dshp-btn-primary:hover:not(:disabled),.dshp-restart-mask[data-theme="dusk"] .dshp-restart-card .dshp-btn-primary,.dshp-restart-mask[data-theme="dusk"] .dshp-restart-card .dshp-btn-primary:hover:not(:disabled){color:#fff;background:#3d8f68;border-color:#3d8f68}
+.dshp-cr-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 0;font-size:12.5px}
+.dshp-cr-row label{display:inline-flex;align-items:center;gap:6px;color:var(--dshp-ink)}
+.dshp-cr-num{width:64px;min-width:64px;height:28px}
+.dshp-cr-text{width:120px;min-width:88px;height:28px}
 .dshp-notice{font-size:12.5px;line-height:1.4}
 .dshp-notice.is-ok{color:var(--dshp-ok)}
 .dshp-notice.is-bad{color:var(--dshp-bad)}
 .dshp-skel{height:12px;border-radius:6px;background:linear-gradient(90deg,var(--dshp-fill),var(--dshp-line),var(--dshp-fill));background-size:200% 100%;animation:dshp-pulse 1.2s ease-in-out infinite}
-.dshp-active{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;border:1px solid var(--dshp-line);background:var(--dshp-bg);border-radius:8px}
-.dshp-active b{font-family:var(--dshp-display);font-weight:500}
-.dshp-empty{padding:28px 12px;font-size:13px;color:var(--dshp-mute);text-align:center}
+.dshp-active{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;margin-bottom:12px;border:1px solid var(--dshp-line);background:var(--dshp-fill);border-radius:8px}
+.dshp-active b{font-weight:600}
+.dshp-empty{padding:24px 12px;font-size:12.5px;color:var(--dshp-mute);text-align:center}
 .dshp-split{display:flex;flex-direction:column;gap:12px}
-.dshp-rulelist{display:flex;flex-direction:column;border:1px solid var(--dshp-line);border-radius:8px;background:var(--dshp-bg);overflow:hidden}
+.dshp-rulelist{display:flex;flex-direction:column;border:1px solid var(--dshp-line);border-radius:10px;background:var(--dshp-paper);overflow:hidden}
 .dshp-rulebody{max-height:240px;overflow:auto}
 .dshp-ruleitem{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:0;border-bottom:1px solid var(--dshp-line);background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .dshp-ruleitem:hover{background:var(--dshp-fill)}
-.dshp-ruleitem.is-edit{background:var(--dshp-accent-soft)}
+.dshp-ruleitem.is-edit{background:var(--dshp-fill)}
 .dshp-rule-main{flex:1;min-width:0}
-.dshp-rule-name{display:flex;align-items:center;gap:8px;font-family:var(--dshp-display);font-size:14px;line-height:1.35}
-.dshp-rule-meta{display:block;margin-top:3px;font-family:var(--dshp-mono);font-size:11px;color:var(--dshp-mute)}
+.dshp-rule-name{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;line-height:20px}
+.dshp-rule-meta{display:block;margin-top:2px;font-family:var(--dshp-mono);font-size:11px;line-height:16px;color:var(--dshp-mute)}
 .dshp-rule-ops{display:flex;flex-direction:row;align-items:center;gap:6px;flex-shrink:0}
 .dshp-create{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-top:1px solid var(--dshp-line);background:var(--dshp-paper)}
-.dshp-create-row{display:flex;gap:6px;align-items:center}
+.dshp-create-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .dshp-create .dshp-field{flex:1;min-width:0;width:auto}
-.dshp-editor{display:flex;flex-direction:column;gap:10px;min-width:0;border:1px solid var(--dshp-line);border-radius:8px;background:var(--dshp-bg);padding:12px;min-height:320px}
+.dshp-editor{display:flex;flex-direction:column;gap:10px;min-width:0;border-top:1px solid var(--dshp-line);padding-top:12px;min-height:320px}
 .dshp-editor .dshp-area{flex:1;min-height:240px}
-.dshp-editor-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--dshp-mute);font-size:13px;min-height:160px}
+.dshp-editor-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--dshp-mute);font-size:12.5px;min-height:160px}
 .dshp-block{padding:14px 0;border-top:1px solid var(--dshp-line)}
+.dshp-head+.dshp-block{border-top:0;padding-top:0}
 .dshp-block-head{display:flex;align-items:center;gap:10px;margin:0 0 8px}
-.dshp-block-head h4{margin:0;font-family:var(--dshp-display);font-size:14px;font-weight:500;flex:1;color:var(--dshp-ink)}
+.dshp-block-head h4{margin:0;font-size:13px;font-weight:600;flex:1;color:var(--dshp-ink)}
 .dshp-block-hint{margin:8px 0 0;font-size:12px;line-height:1.55;color:var(--dshp-mute)}
 .dshp-policy-row{display:flex;align-items:center;gap:10px}
-.dshp-policy-row>label{font-size:12px;color:var(--dshp-mute);flex:0 0 auto}
+.dshp-policy-row>label{font-size:12.5px;color:var(--dshp-mute);flex:0 0 auto}
 .dshp-cwd-path{margin:0 0 8px;font-family:var(--dshp-mono);font-size:11px;color:var(--dshp-mute);word-break:break-all;line-height:1.5}
-.dshp-cwd-list{display:flex;flex-direction:column;border:1px solid var(--dshp-line);border-radius:8px;background:var(--dshp-bg);overflow:hidden}
+.dshp-cwd-list{display:flex;flex-direction:column;border:1px solid var(--dshp-line);border-radius:10px;background:var(--dshp-paper);overflow:hidden}
 .dshp-cwd-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid var(--dshp-line);cursor:pointer;margin:0}
 .dshp-cwd-item:last-child{border-bottom:0}
 .dshp-cwd-item:hover{background:var(--dshp-fill)}
-.dshp-cwd-item.is-on{background:var(--dshp-accent-soft)}
+.dshp-cwd-item.is-on{background:var(--dshp-fill)}
 .dshp-cwd-item input{margin:3px 0 0;flex:0 0 auto}
 .dshp-cwd-main{flex:1;min-width:0}
-.dshp-cwd-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--dshp-display);font-size:13.5px;line-height:1.35;color:var(--dshp-ink)}
-.dshp-cwd-badge{font-family:var(--dshp-mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:1px 7px;border-radius:99px;border:1px solid var(--dshp-line);color:var(--dshp-mute);line-height:1.6}
+.dshp-cwd-name{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;font-weight:500;line-height:20px;color:var(--dshp-ink)}
+.dshp-cwd-badge{font-size:10.5px;padding:0 6px;border-radius:4px;border:1px solid var(--dshp-line);color:var(--dshp-mute);line-height:16px}
 .dshp-cwd-size{font-family:var(--dshp-mono);font-size:11px;color:var(--dshp-mute)}
-.dshp-cwd-sub{margin-top:3px;font-family:var(--dshp-mono);font-size:11px;color:var(--dshp-mute);word-break:break-all}
+.dshp-cwd-sub{margin-top:2px;font-family:var(--dshp-mono);font-size:11px;color:var(--dshp-mute);word-break:break-all}
 .dshp-cwd-prev{margin-top:4px;font-size:11px;line-height:1.5;color:var(--dshp-mute);max-height:34px;overflow:hidden}
 @keyframes dshp-pulse{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@media (max-width:640px){.dshp-metrics{grid-template-columns:1fr}.dshp-ruleitem{flex-wrap:wrap}.dshp-rule-ops{width:100%;justify-content:flex-end}}
-@media (prefers-reduced-motion:reduce){.dshp-btn,.dshp-bar>i{transition:none}.dshp-skel{animation:none}}
-
-/* 设置页：页头 + 分段，内容一次只摊一段 */
-.dshp-page{max-width:760px;gap:16px;padding:4px 0 24px}
-.dshp-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.dshp-page-text{display:flex;flex-direction:column;gap:3px;min-width:0}
-.dshp-page .dshp-title{font-size:22px;line-height:30px;letter-spacing:.01em}
-.dshp-page .dshp-panel .dshp-title{font-size:17px;line-height:24px}
-.dshp-page-lead{margin:0;font-size:13px;line-height:20px;color:var(--dshp-mute);max-width:54ch}
-.dshp-page .dshp-panel{border-radius:12px;box-shadow:0 1px 2px color-mix(in srgb,var(--dshp-ink) 6%,transparent)}
-.dshp-page .dshp-metrics{grid-template-columns:repeat(auto-fit,minmax(165px,1fr))}
+.dshp-modal-bg{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.32)}
+.dshp-modal{width:min(420px,100%);background:var(--dshp-paper);color:var(--dshp-ink);border:1px solid var(--dshp-line);border-radius:14px;padding:20px;box-shadow:0 16px 48px rgba(0,0,0,.18)}
+.dshp-modal h4{margin:0 0 8px;font-size:15px;font-weight:600;line-height:22px}
+.dshp-modal p{margin:0 0 16px;font-size:13px;line-height:1.6;color:var(--dshp-mute)}
+.dshp-modal-ops{display:flex;justify-content:flex-end;gap:8px}
+.dshp-restart-mask{position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.4);font-family:"Segoe UI Variable Text","Segoe UI","Microsoft YaHei UI","PingFang SC",system-ui,sans-serif}
+.dshp-restart-card{width:min(420px,100%);box-sizing:border-box;padding:20px;border-radius:14px;background:var(--dsw-alias-bg-layer-2,#fff);color:var(--dsw-alias-label-primary,#17181a);border:1px solid var(--dsw-alias-border-l1,#e3e5e8);box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.dshp-restart-card h4{margin:0 0 8px;font-size:16px;font-weight:600;line-height:24px;color:inherit}
+.dshp-restart-card p{margin:0 0 18px;font-size:13px;line-height:1.6;color:var(--dsw-alias-label-secondary,#6b7077)}
+.dshp-restart-card .dshp-modal-ops{display:flex;justify-content:flex-end;gap:8px}
+.dshp-restart-card .dshp-btn{min-height:32px;padding:0 12px;font-size:13px;font-weight:500;color:var(--dsw-alias-label-primary,#17181a);background:var(--dsw-alias-bg-layer-2,#fff);border:1px solid var(--dsw-alias-border-l1,#e3e5e8)}
+.dshp-restart-card .dshp-btn-primary,.dshp-restart-card .dshp-btn-primary:hover:not(:disabled){color:var(--dsw-alias-bg-layer-2,#fff);background:var(--dsw-alias-label-primary,#17181a);border-color:var(--dsw-alias-label-primary,#17181a)}
+.dshp-auth-mask{position:fixed;inset:0;z-index:10100;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;padding:20px;pointer-events:auto;--dshp-warn:#9a6700;--dshp-bad:#cf222e}
+.dshp-auth-mask.dshp-env-gate{z-index:10200}
+.dshp-auth-modal{width:min(680px,100%);max-height:min(88vh,820px);display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid var(--dsw-alias-border-l1,#e3e5e8);border-radius:14px;background:var(--dsw-alias-bg-layer-2,#fff);color:var(--dsw-alias-label-primary,#17181a);box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.dshp-auth-modal h2{margin:0;font-size:16px;font-weight:600;line-height:24px}
+.dshp-auth-warn{padding:8px 10px;border:1px solid color-mix(in srgb,var(--dshp-warn) 24%,transparent);border-radius:8px;background:color-mix(in srgb,var(--dshp-warn) 8%,transparent);color:var(--dshp-warn);font-size:12.5px;line-height:1.5}
+.dshp-auth-legal{overflow:auto;height:300px;margin:0;padding:10px 12px;border:1px solid var(--dsw-alias-border-l1,#e3e5e8);border-radius:8px;background:var(--dsw-alias-bg-layer-1,#f6f7f8);font-size:12.5px;line-height:1.6}
+.dshp-auth-legal h3{margin:14px 0 4px;font-size:12.5px}
+.dshp-auth-legal h3:first-child{margin-top:0}
+.dshp-auth-legal p{margin:0 0 8px}
+.dshp-auth-checks{display:flex;flex-direction:column;gap:8px;font-size:12.5px}
+.dshp-auth-checks label{display:flex;gap:8px;align-items:flex-start}
+.dshp-auth-checks label.locked{opacity:.45}
+.dshp-auth-checks input{accent-color:var(--dsw-alias-label-primary,#17181a)}
+.dshp-auth-ops{display:flex;justify-content:flex-end;gap:8px}
+.dshp-auth-ops button{appearance:none;border:1px solid var(--dsw-alias-border-l1,#e3e5e8);background:var(--dsw-alias-bg-layer-2,#fff);color:inherit;border-radius:8px;min-height:32px;padding:0 12px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;line-height:1}
+.dshp-auth-ops button.primary{background:var(--dsw-alias-label-primary,#17181a);border-color:var(--dsw-alias-label-primary,#17181a);color:var(--dsw-alias-bg-layer-2,#fff)}
+.dshp-auth-ops button:disabled{opacity:.45;cursor:default}
+body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
+.dshp-page{max-width:760px;gap:16px;padding:0 0 24px}
+.dshp-page-head{display:flex;flex-direction:column;gap:12px;flex-wrap:nowrap}
+.dshp-page-text{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dshp-page .dshp-title{font-size:16px;line-height:24px;letter-spacing:0}
+.dshp-page .dshp-panel .dshp-title{font-size:14px;line-height:20px}
+.dshp-page-lead{margin:0;font-size:12.5px;line-height:18px;color:var(--dshp-mute);max-width:60ch}
+.dshp-page .dshp-panel{border-radius:12px;box-shadow:none}
 .dshp-page .dshp-head{margin-bottom:12px}
-.dshp-page .dshp-head .dshp-page-lead{font-size:12.5px}
-.dshp-segbar{display:inline-flex;align-items:center;gap:2px;padding:3px;border:1px solid var(--dshp-line);border-radius:10px;background:var(--dshp-fill);flex:none}
-.dshp-seg{appearance:none;border:0;background:transparent;color:var(--dshp-mute);font:inherit;font-size:13px;line-height:20px;padding:4px 12px;border-radius:7px;cursor:pointer;white-space:nowrap;transition:background .15s var(--dshp-ease),color .15s var(--dshp-ease)}
-.dshp-seg:hover{color:var(--dshp-ink)}
-.dshp-seg.on{background:var(--dshp-paper);color:var(--dshp-ink);box-shadow:0 1px 2px color-mix(in srgb,var(--dshp-ink) 12%,transparent)}
-.dshp-seg:focus-visible{outline:2px solid var(--dshp-accent);outline-offset:1px}
-/* 内嵌演练台：高度给足，内部滚动交给演练台自己 */
-.dshp-embed{display:flex;flex-direction:column;height:min(70vh,640px);min-height:420px;border:1px solid var(--dshp-line);border-radius:12px;background:var(--dshp-paper);overflow:hidden}
+.dshp-page .dshp-head .dshp-page-lead{font-size:12px}
+.dshp-tabs{display:flex;align-items:center;gap:2px;border-bottom:1px solid var(--dshp-line);overflow-x:auto;scrollbar-width:none}
+.dshp-tabs::-webkit-scrollbar{display:none}
+.dshp-tab{appearance:none;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--dshp-mute);font:500 13px/20px var(--dshp-sans);padding:7px 10px 9px;margin-bottom:-1px;border-radius:0;cursor:pointer;white-space:nowrap;transition:color .15s var(--dshp-ease)}
+.dshp-tab:hover{color:var(--dshp-ink)}
+.dshp-tab.on{color:var(--dshp-ink);font-weight:600;border-bottom-color:var(--dshp-ink)}
+.dshp-tab:focus-visible{outline:2px solid var(--dshp-ink);outline-offset:-2px}
+.dshp-embed{display:flex;flex-direction:column;height:min(70vh,640px);min-height:420px;border:1px solid var(--dshp-line);border-radius:10px;background:var(--dshp-paper);overflow:hidden}
 .dshp-embed .rt-dock{position:relative;inset:auto;width:100%!important;height:100%;max-width:none!important;flex:1;min-height:0;display:flex!important;flex-direction:column;border:0;border-radius:0;box-shadow:none;background:transparent!important;backdrop-filter:none}
 .dshp-embed .rt-body{flex:1;min-height:0;overflow:hidden}
 .dshp-embed .rt-main{min-height:0;flex:1;overflow:hidden}
 .dshp-embed .rt-pane{min-height:0;overflow:auto}
 .dshp-embed .rt-embedded>.rt-head,.dshp-embed .rt-tabs,.dshp-embed .rt-foot{flex:none}
-.dshp-embed .rt-tab{font-size:13.5px}
+.dshp-embed .rt-tab{font-size:13px}
 .dshp-embed .rt-err{font-weight:600}
-.dshp-embed .rt-rep-http,.dshp-embed pre{background:color-mix(in srgb,var(--dshp-ink) 5%,transparent);border:1px solid var(--dshp-line);border-radius:6px}
-@media (max-width:640px){.dshp-page-head{flex-direction:column;align-items:stretch}.dshp-segbar{align-self:flex-start;max-width:100%;overflow:auto}.dshp-page .dshp-panel{padding:14px}.dshp-page .dshp-title{font-size:20px}.dshp-page .dshp-table{display:block;font-size:12px}.dshp-page .dshp-table thead{display:none}.dshp-page .dshp-table tbody{display:block}.dshp-page .dshp-table tr{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 10px;border-bottom:1px solid var(--dshp-line)}.dshp-page .dshp-table tr:last-child{border-bottom:0}.dshp-page .dshp-table td{display:block;padding:0;border:0}.dshp-page .dshp-table th:first-child,.dshp-page .dshp-table .dshp-id{display:none}.dshp-page .dshp-table td:nth-child(2){flex:1 1 100%;min-width:0}.dshp-page .dshp-table td:last-child{flex:none}.dshp-embed{height:min(74vh,560px);min-height:380px}}
-
-/* 授权 / 欢迎窗 */
-.dshp-auth-mask{position:fixed;inset:0;z-index:10100;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:20px;pointer-events:auto}
-.dshp-env-gate{z-index:10200}
-body:not([data-ds-dark-theme]) .dshp-auth-modal{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fffcf7) 92%,transparent);color:var(--dsw-alias-label-primary,#1a1916);border-color:color-mix(in srgb,var(--dsw-alias-border-l1,#c9c3b6) 80%,transparent);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3)}
-body:not([data-ds-dark-theme]) .dshp-auth-legal{background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#f3f0e8) 90%,transparent);color:var(--dsw-alias-label-primary,#1a1916);border-color:color-mix(in srgb,var(--dsw-alias-border-l1,#c9c3b6) 80%,transparent)}
-body:not([data-ds-dark-theme]) .dshp-auth-warn{background:color-mix(in srgb,#f5e6c8 88%,transparent);color:#6b4a10}
-body:not([data-ds-dark-theme]) .dshp-auth-ops button{border-color:var(--dsw-alias-border-l1,#c9c3b6);color:var(--dsw-alias-label-primary,#1a1916);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#fff) 88%,transparent)}
-body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--dsw-alias-brand-primary,#3f6b52);border-color:var(--dsw-alias-brand-primary,#3f6b52);color:#fff}
-.dshp-auth-modal{width:min(680px,100%);max-height:min(88vh,820px);display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--dsw-alias-border-l1,#333);border-radius:12px;background:var(--dsw-alias-bg-layer-1,#1a1a1a);color:var(--dsw-alias-label-primary,#eee)}
-.dshp-auth-modal h2{margin:0;font-size:16px;font-weight:600}
-.dshp-auth-warn{padding:8px 10px;border-radius:8px;background:#3a2e18;color:#f0d48a;font-size:13px}
-.dshp-auth-legal{overflow:auto;height:300px;margin:0;padding:10px 12px;border:1px solid var(--dsw-alias-border-l1,#333);border-radius:8px;background:#121212;font-size:13px;line-height:1.55}
-.dshp-auth-legal h3{margin:14px 0 4px;font-size:13px}
-.dshp-auth-legal h3:first-child{margin-top:0}
-.dshp-auth-legal p{margin:0 0 8px}
-.dshp-auth-checks{display:flex;flex-direction:column;gap:8px;font-size:13px}
-.dshp-auth-checks label{display:flex;gap:8px;align-items:flex-start}
-.dshp-auth-checks label.locked{opacity:.45}
-.dshp-auth-ops{display:flex;justify-content:flex-end;gap:8px}
-.dshp-auth-ops button{appearance:none;border:1px solid var(--dsw-alias-border-l1,#444);background:transparent;color:inherit;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit}
-.dshp-auth-ops button.primary{background:#2a4033;border-color:#8fbf9a}
-.dshp-auth-ops button:disabled{opacity:.45;cursor:default}
-
+.dshp-embed .rt-rep-http,.dshp-embed pre{background:var(--dshp-fill);border:1px solid var(--dshp-line);border-radius:6px}
+@media (max-width:640px){.dshp-page-head{gap:10px}.dshp-page .dshp-panel{padding:14px}.dshp-page .dshp-title{font-size:16px}.dshp-metrics{grid-template-columns:1fr}.dshp-metric{border-right:0;border-bottom:1px solid var(--dshp-line)}.dshp-metric:last-child{border-bottom:0}.dshp-page .dshp-table{display:block;font-size:12px}.dshp-page .dshp-table thead{display:none}.dshp-page .dshp-table tbody{display:block}.dshp-page .dshp-table tr{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 10px;border-bottom:1px solid var(--dshp-line)}.dshp-page .dshp-table tr:last-child{border-bottom:0}.dshp-page .dshp-table td{display:block;padding:0;border:0}.dshp-page .dshp-table th:first-child,.dshp-page .dshp-table .dshp-id{display:none}.dshp-page .dshp-table td:nth-child(2){flex:1 1 100%;min-width:0}.dshp-page .dshp-table td:last-child{flex:none}.dshp-embed{height:min(74vh,560px);min-height:380px}}
+@media (max-width:640px){.dshp-metrics{grid-template-columns:1fr}.dshp-ruleitem{flex-wrap:wrap}.dshp-rule-ops{width:100%;justify-content:flex-end}}
+@media (prefers-reduced-motion:reduce){.dshp-btn,.dshp-bar>i{transition:none}.dshp-skel{animation:none}}
 `;
 
 		function formatSize(bytes) {
@@ -1243,8 +1113,6 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			const [override, setOverride] = useState("");
 			const [defaultOverride, setDefaultOverride] = useState("");
 			const [overrideLoaded, setOverrideLoaded] = useState(false);
-			const [ownServers, setOwnServers] = useState("");
-			const [ownLoaded, setOwnLoaded] = useState(false);
 			const [patchBusy, setPatchBusy] = useState(false);
 			const [askRestart, setAskRestart] = useState(false);
 			const suppressRestartAsk = useRef(false);
@@ -1297,14 +1165,6 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 						else setNotice({ kind: "error", text: tr("err.override", { error: (d && d.error) || "" }) });
 					})
 					.catch((e) => setNotice({ kind: "error", text: tr("err.override", { error: e.message }) }));
-				apiJson("/dsh-purge/own-servers")
-					.then((d) => {
-						if (d && d.ok) {
-							setOwnServers(typeof d.content === "string" ? d.content : "");
-							setOwnLoaded(true);
-						}
-					})
-					.catch(() => {});
 			}, []);
 
 			useEffect(() => {
@@ -1502,10 +1362,6 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					fetch("/", { cache: "no-store", credentials: "same-origin" })
 						.then((r) => {
 							if (r.ok) {
-								try {
-									window.localStorage.removeItem("dshp-theme");
-									window.localStorage.removeItem("dshp-theme-mode");
-								} catch { /* ignore */ }
 								window.location.reload();
 								return;
 							}
@@ -1620,7 +1476,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					),
 				) : null,
 				h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("apply.hint")),
-				s && !s.ai_base ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-danger, #c44)", fontSize: 12 } }, hostText(t, "warn.noRoot", hostSurface)) : null,
+				s && !s.ai_base ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-bad, #cf222e)", fontSize: 12 } }, hostText(t, "warn.noRoot", hostSurface)) : null,
 				s && s.ai_base && s.override_status === "missing" ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("warn.noInject")) : null,
 				askRestart ? h(RestartAsk, {
 					t: t,
@@ -1656,44 +1512,8 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				}),
 				promptBoxEmpty(override) ? h("p", {
 					className: "dshp-hint",
-					style: { margin: "8px 0 0", color: "var(--dshp-danger, #c44)", fontSize: 12 },
+					style: { margin: "8px 0 0", color: "var(--dshp-bad, #cf222e)", fontSize: 12 },
 				}, t("need.prompt")) : null,
-				h("div", { className: "dshp-sub" },
-					h("h4", null, t("own.title")),
-					h("div", { className: "dshp-row", style: { margin: 0 } },
-						h(Btn, {
-							kind: "primary",
-							tiny: true,
-							disabled: !ownLoaded,
-							onClick: () => {
-								fetch("/dsh-purge/own-servers", {
-									method: "POST",
-									headers: { "content-type": "application/json" },
-									body: JSON.stringify({ content: ownServers }),
-								}).then((r) => r.json()).then((d) => {
-									if (!d || !d.ok) {
-										setNotice({ kind: "error", text: (d && d.error) || t("err.override", { error: "" }) });
-										return;
-									}
-									if (typeof d.content === "string") setOwnServers(d.content);
-									setNotice({
-										kind: "ok",
-										text: d.dropped > 0 ? t("saved.own.dropped", { n: d.dropped }) : t("saved.own"),
-									});
-								}).catch((e) => setNotice({ kind: "error", text: e.message }));
-							},
-						}, t("own.save")),
-					),
-				),
-				h("textarea", {
-					className: "dshp-area",
-					value: ownServers,
-					onChange: (e) => setOwnServers(e.target.value),
-					spellCheck: false,
-					rows: 4,
-					style: { minHeight: 96 },
-				}),
-				h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("own.hint")),
 			);
 		}
 
@@ -1967,307 +1787,6 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			);
 		}
 
-		function skillUiAllowed(d) {
-			if (!d) return false;
-			const ver = String(d.plugin_version || d.localVersion || "").replace(/^v/i, "");
-			if (/^1\.1\.11(?:-|$)/.test(ver)) return false;
-			const parts = ver.match(/^(\d+)\.(\d+)\.(\d+)/);
-			if (!parts) return false;
-			if (+parts[1] !== 1) return +parts[1] > 1;
-			if (+parts[2] !== 1) return +parts[2] > 1;
-			return +parts[3] >= 12;
-		}
-
-		function SkillsSection() {
-			const t = useT();
-			const tRef = useRef(t);
-			tRef.current = t;
-			const [onBeta, setOnBeta] = useState(false);
-			const [st, setSt] = useState(null);
-			const [editId, setEditId] = useState(null);
-			const [editDesc, setEditDesc] = useState("");
-			const [content, setContent] = useState("");
-			const [busy, setBusy] = useState(false);
-			const [notice, setNotice] = useState({ kind: "idle", text: "" });
-			const zipRef = useRef(null);
-			const folderRef = useRef(null);
-
-			const loadStatus = useCallback(() => {
-				const tr = tRef.current;
-				const fail = (e) => {
-					setSt({ ok: false, skills: [] });
-					setNotice({
-						kind: "error",
-						text: skillsRouteMissing(e) ? tr("err.skills.needRestart") : tr("err.skills", { error: (e && e.message) || e || "bad response" }),
-					});
-				};
-				const apply = (d) => {
-					if (d && d.ok) setSt({ ok: true, skills: d.skills || [] });
-					else fail({ message: (d && d.error) || "bad response" });
-				};
-				apiJson("/dsh-purge/status")
-					.then((d) => {
-						const allowed = skillUiAllowed(d);
-						setOnBeta(allowed);
-						if (!allowed) {
-							setSt(null);
-							return;
-						}
-						if (d.skills) {
-							apply({ ok: true, skills: d.skills });
-							return;
-						}
-						skillsApi("status").then(apply).catch(fail);
-					})
-					.catch(() => {
-						setOnBeta(false);
-						setSt(null);
-					});
-			}, []);
-
-			useEffect(() => { loadStatus(); }, [loadStatus]);
-
-			const doPost = useCallback((action, payload, after) => {
-				setBusy(true);
-				setNotice({ kind: "idle", text: "" });
-				skillsApi(action, payload)
-					.then((d) => {
-						if (d && d.ok) {
-							setNotice({ kind: "ok", text: t("ok.done") });
-							loadStatus();
-							if (after) after(d);
-						} else {
-							setNotice({ kind: "error", text: t("err.action", { error: (d && d.error) || "" }) });
-						}
-					})
-					.catch((e) => setNotice({
-						kind: "error",
-						text: skillsRouteMissing(e) ? t("err.skills.needRestart") : t("err.action", { error: e.message }),
-					}))
-					.finally(() => setBusy(false));
-			}, [loadStatus, t]);
-
-			const openSkill = useCallback((id) => {
-				setBusy(true);
-				skillsApi("read", { id: id })
-					.then((d) => {
-						if (d.ok) {
-							setEditId(id);
-							setEditDesc(d.description || "");
-							setContent(typeof d.content === "string" ? d.content : "");
-						} else setNotice({ kind: "error", text: t("err.read", { error: d.error || "" }) });
-					})
-					.catch((e) => setNotice({ kind: "error", text: t("err.read", { error: e.message }) }))
-					.finally(() => setBusy(false));
-			}, [t]);
-
-			const clearEditor = () => {
-				setEditId(null);
-				setEditDesc("");
-				setContent("");
-			};
-
-			const readAsBase64 = (file) => new Promise((resolve, reject) => {
-				const reader = new FileReader();
-				reader.onload = () => {
-					const text = String(reader.result || "");
-					const at = text.indexOf(",");
-					resolve(at >= 0 ? text.slice(at + 1) : text);
-				};
-				reader.onerror = () => reject(new Error(t("need.import")));
-				reader.readAsDataURL(file);
-			});
-
-			const importZip = (file) => {
-				if (!file) {
-					setNotice({ kind: "error", text: t("need.import") });
-					return;
-				}
-				setBusy(true);
-				setNotice({ kind: "ok", text: t("skills.importing") });
-				readAsBase64(file)
-					.then((data) => skillsApi("import", { data, name: file.name }))
-					.then((d) => {
-						if (!d || !d.ok) throw new Error((d && d.error) || "");
-						setNotice({ kind: "ok", text: t("saved.import", { count: (d.imported || []).length || 1 }) });
-						loadStatus();
-					})
-					.catch((e) => setNotice({
-						kind: "error",
-						text: skillsRouteMissing(e) ? t("err.skills.needRestart") : t("err.action", { error: e.message }),
-					}))
-					.finally(() => setBusy(false));
-			};
-
-			const keepFolderFile = (file) => {
-				const rel = String(file.webkitRelativePath || file.name || "").replace(/\\/g, "/");
-				if (!rel || rel.includes("..")) return false;
-				if (/(^|\/)(node_modules|\.git|__MACOSX|\.system)(\/|$)/i.test(rel)) return false;
-				if (/(^|\/)\._/.test(rel) || /\/\.DS_Store$/i.test(rel)) return false;
-				return true;
-			};
-
-			const importFolder = (list) => {
-				const files = Array.from(list || []).filter(keepFolderFile);
-				if (!files.length) {
-					setNotice({ kind: "error", text: t("err.import.folder") });
-					return;
-				}
-				setBusy(true);
-				setNotice({ kind: "ok", text: t("skills.importing") });
-				Promise.all(files.map((file) => readAsBase64(file).then((content) => ({
-					path: file.webkitRelativePath || file.name,
-					content,
-					encoding: "base64",
-				}))))
-					.then((payload) => skillsApi("import", {
-						files: payload,
-						name: String(payload[0] && payload[0].path || "").split("/")[0],
-					}))
-					.then((d) => {
-						if (!d || !d.ok) throw new Error((d && d.error) || "");
-						setNotice({ kind: "ok", text: t("saved.import", { count: (d.imported || []).length || 1 }) });
-						loadStatus();
-					})
-					.catch((e) => setNotice({
-						kind: "error",
-						text: skillsRouteMissing(e) ? t("err.skills.needRestart") : t("err.action", { error: e.message }),
-					}))
-					.finally(() => setBusy(false));
-			};
-
-			if (!onBeta) return null;
-
-			let list;
-			if (!st) {
-				list = h("div", { className: "dshp-skel", style: { height: 80, margin: 12 } });
-			} else if (!st.skills || st.skills.length === 0) {
-				list = h("p", { className: "dshp-empty" }, t("skills.empty"));
-			} else {
-				list = st.skills.map((item) => {
-					const isEdit = item.id === editId;
-					return h("div", {
-						key: item.id,
-						className: "dshp-ruleitem" + (isEdit ? " is-edit" : ""),
-						role: "button",
-						tabIndex: 0,
-						onClick: () => openSkill(item.id),
-						onKeyDown: (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openSkill(item.id); } },
-					},
-						h("div", { className: "dshp-rule-main" },
-							h("span", { className: "dshp-rule-name" }, item.id),
-							h("span", { className: "dshp-rule-meta" },
-								(item.valid ? item.description : t("skills.invalid")) + " · " + formatSize(item.size),
-							),
-							item.valid ? h("span", { className: "dshp-rule-meta" },
-								[
-									item.userInvocable ? t("skills.call.slash", { cmd: "/" + item.id }) : t("skills.call.userOff"),
-									item.modelInvocable ? t("skills.call.model") : t("skills.call.modelOff"),
-								].join(" · "),
-							) : null,
-						),
-						h("div", { className: "dshp-rule-ops" },
-							h(Btn, {
-								tiny: true,
-								kind: "danger",
-								disabled: busy,
-								onClick: (e) => {
-									e.stopPropagation();
-									if (!window.confirm(t("confirm.delete.skill", { id: item.id }))) return;
-									if (editId === item.id) clearEditor();
-									doPost("delete", { id: item.id });
-								},
-							}, t("delete")),
-						),
-					);
-				});
-			}
-
-			return h("section", { className: "dshp-panel", "aria-label": t("skills.title") },
-				h("div", { className: "dshp-head" },
-					h("h3", { className: "dshp-title" }, t("skills.title")),
-					h("div", { className: "dshp-row", style: { margin: 0 } }, noticeNode(notice)),
-				),
-				h("p", { className: "dshp-hint", style: { margin: "0 0 10px", color: "var(--dshp-mute)", fontSize: 12 } }, hostText(t, "skills.hint", hostSurfaceOf())),
-				h("div", { className: "dshp-split" },
-					h("div", { className: "dshp-rulelist" },
-						h("div", { className: "dshp-rulebody" }, list),
-						h("div", { className: "dshp-create" },
-							h("div", { className: "dshp-create-row" },
-								h("input", {
-									ref: zipRef,
-									type: "file",
-									accept: ".zip,.tgz,.tar.gz,.tar,.skill",
-									style: { display: "none" },
-									onChange: (e) => {
-										const file = e.target.files && e.target.files[0];
-										e.target.value = "";
-										importZip(file);
-									},
-								}),
-								h("input", {
-									ref: (el) => {
-										folderRef.current = el;
-										if (!el) return;
-										el.setAttribute("webkitdirectory", "");
-										el.setAttribute("directory", "");
-										el.multiple = true;
-									},
-									type: "file",
-									multiple: true,
-									style: { display: "none" },
-									onChange: (e) => {
-										const files = Array.from((e.target && e.target.files) || []);
-										e.target.value = "";
-										importFolder(files);
-									},
-								}),
-								h(Btn, {
-									kind: "primary",
-									tiny: true,
-									disabled: busy,
-									onClick: () => zipRef.current && zipRef.current.click(),
-								}, t("btn.importZip")),
-								h(Btn, {
-									tiny: true,
-									disabled: busy,
-									onClick: () => folderRef.current && folderRef.current.click(),
-								}, t("btn.importFolder")),
-							),
-						),
-					),
-					h("div", { className: "dshp-editor" },
-						editId ? [
-							h("div", { key: "meta", className: "dshp-row" },
-								h("input", {
-									className: "dshp-field",
-									placeholder: t("ph.skill.desc"),
-									value: editDesc,
-									onChange: (e) => setEditDesc(e.target.value),
-								}),
-							),
-							h("textarea", {
-								key: "body",
-								className: "dshp-area",
-								value: content,
-								onChange: (e) => setContent(e.target.value),
-								spellCheck: false,
-								placeholder: "",
-							}),
-							h("div", { key: "save", className: "dshp-row" },
-								h(Btn, {
-									kind: "primary",
-									disabled: busy,
-									onClick: () => doPost("save", { id: editId, content, description: editDesc }),
-								}, t("btn.saveSkill")),
-								noticeNode(notice),
-							),
-						] : h("div", { className: "dshp-editor-empty" }, t("skills.pick")),
-					),
-				),
-			);
-		}
-
 		function reopenAfterRestart() {
 			window.location.reload();
 		}
@@ -2413,7 +1932,6 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 		const PAGE_SEGMENTS = [
 			{ id: "armor", key: "page.seg.armor" },
 			{ id: "rules", key: "page.seg.rules" },
-			{ id: "skills", key: "page.seg.skills" },
 			{ id: "drill", key: "page.seg.drill" },
 		];
 
@@ -2422,6 +1940,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			const [seg, setSeg] = useState("armor");
 			const theme = useHostTheme();
 			translate = t;
+			const segments = PAGE_SEGMENTS.filter((item) => item.id !== "drill" || Boolean(__dshPurgeDrill && __dshPurgeDrill.Panel));
 			return h("div", { className: "dshp-root dshp-page", "data-theme": theme, "data-seg": seg },
 				h("style", null, PURGE_CSS),
 				h("div", { className: "dshp-page-head" },
@@ -2429,25 +1948,24 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 						h("h2", { className: "dshp-title" }, t("page.title")),
 						h("p", { className: "dshp-page-lead" }, t("page.lead")),
 					),
-					h("div", { className: "dshp-segbar", role: "tablist", "aria-label": t("page.title") },
-						PAGE_SEGMENTS.map((item) => h("button", {
+					h("div", { className: "dshp-tabs", role: "tablist", "aria-label": t("page.title") },
+						segments.map((item) => h("button", {
 							key: item.id,
 							type: "button",
 							role: "tab",
 							"aria-selected": seg === item.id ? "true" : "false",
-							className: "dshp-seg" + (seg === item.id ? " on" : ""),
+							className: "dshp-tab" + (seg === item.id ? " on" : ""),
 							onClick: () => setSeg(item.id),
 						}, t(item.key))),
 					),
 				),
 				seg === "armor" ? h(PurgifySection, null) : null,
 				seg === "rules" ? h(RulesSection, null) : null,
-				seg === "skills" ? h(SkillsSection, null) : null,
 				seg === "drill" ? h(DrillSection, { t: t }) : null,
 			);
 		}
 
-		/* 演练台放在设置页第四段。未授权时只显示一张授权卡片，不往会话界面塞浮窗。 */
+		/* 演练台放在设置页第三段。未授权时只显示一张授权卡片，不往会话界面塞浮窗。 */
 		function DrillSection(props) {
 			const t = typeof props.t === "function" ? props.t : translate;
 			const [granted, setGranted] = useState(() => readDrillAuth());
@@ -2472,94 +1990,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				);
 			}
 			const Panel = __dshPurgeDrill && __dshPurgeDrill.Panel;
-			if (!Panel) {
-				return h("section", { className: "dshp-panel" },
-					h("p", { className: "dshp-page-lead" }, t("page.drill.unavailable")),
-				);
-			}
 			return h("div", { className: "dshp-embed" }, h(Panel, { embedded: true }));
-		}
-
-		/* settings.section 只投影 id / order / label，没有 icon 字段。
-		 * 按 label 认出自己那一行，用 mask 图标替换外壳按 id 生成的齿轮。 */
-		const NAV_ICON_MARKER = "data-dsh-purge-nav-icon";
-		const NAV_ICON_SVG =
-			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round">' +
-			'<path d="M4 7h9M19 7h1M4 17h3M13 17h7"/>' +
-			'<circle cx="16" cy="7" r="2.1"/><circle cx="9" cy="17" r="2.1"/>' +
-			"</svg>";
-		const NAV_ICON_MASK_URL = "url(\"data:image/svg+xml;utf8," + encodeURIComponent(NAV_ICON_SVG) + "\")";
-		const NAV_ROW_SELECTOR = "[role=\"dialog\"] nav button";
-
-		function installSettingsNavIcon(ctx, resolveLabel) {
-			if (typeof document === "undefined" || !ctx || typeof ctx.effect !== "function") return;
-			ctx.effect(() => {
-				const tag = document.createElement("style");
-				tag.dataset.plugin = "dsh-purge";
-				tag.dataset.pluginCss = "dsh-purge/settings-nav-icon";
-				tag.textContent = [
-					"[" + NAV_ICON_MARKER + "] > svg { display: none; }",
-					"[" + NAV_ICON_MARKER + "]::before {",
-					"  content: '';",
-					"  flex: none;",
-					"  width: 16px;",
-					"  height: 16px;",
-					"  background-color: currentColor;",
-					"  -webkit-mask-image: " + NAV_ICON_MASK_URL + ";",
-					"  mask-image: " + NAV_ICON_MASK_URL + ";",
-					"  -webkit-mask-repeat: no-repeat;",
-					"  mask-repeat: no-repeat;",
-					"  -webkit-mask-position: center;",
-					"  mask-position: center;",
-					"  -webkit-mask-size: 16px 16px;",
-					"  mask-size: 16px 16px;",
-					"}",
-				].join("\n");
-				document.head.appendChild(tag);
-				let disposed = false;
-				let scheduled = false;
-				let warned = false;
-				const sync = () => {
-					scheduled = false;
-					if (disposed) return;
-					const wanted = String(resolveLabel() || "").trim();
-					if (!wanted) return;
-					const rows = document.querySelectorAll(NAV_ROW_SELECTOR);
-					let hit = null;
-					for (const row of rows) {
-						if (String(row.textContent || "").trim() === wanted) { hit = row; break; }
-					}
-					if (!hit) {
-						if (rows.length > 0 && !warned) {
-							warned = true;
-							try { console.warn("[dsh-purge] settings nav row not found; section registration may have failed"); } catch { /* ignore */ }
-						}
-						return;
-					}
-					if (!hit.hasAttribute(NAV_ICON_MARKER)) hit.setAttribute(NAV_ICON_MARKER, "1");
-				};
-				const schedule = () => {
-					if (scheduled || disposed) return;
-					scheduled = true;
-					window.requestAnimationFrame(sync);
-				};
-				const observer = new MutationObserver(schedule);
-				observer.observe(document.body || document.documentElement, {
-					childList: true,
-					subtree: true,
-					attributes: true,
-					attributeFilter: ["class", "data-ds-dark-theme"],
-				});
-				schedule();
-				return () => {
-					disposed = true;
-					observer.disconnect();
-					tag.remove();
-					for (const row of document.querySelectorAll("[" + NAV_ICON_MARKER + "]")) {
-						row.removeAttribute(NAV_ICON_MARKER);
-					}
-				};
-			}, "dsh-purge: settings nav icon");
 		}
 
 		/* 回退已移除；这里仍保留只读宿主上下文，cwd、模式判断和发送门禁还要拿当前会话。 */
@@ -2757,19 +2188,19 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 .rt-resize-c{right:0;bottom:0;width:16px;height:16px;cursor:nwse-resize}
 .rt-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--dsw-alias-border-l1)}
 .rt-title{font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap}
-.rt-dot{width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-brand-primary)}
+.rt-dot{width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-label-primary)}
 .rt-spacer{flex:1}
 .rt-btn{border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-2);color:inherit;
   border-radius:6px;padding:3px 9px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap}
 .rt-btn:hover{border-color:var(--dsw-alias-border-l2)}
-.rt-btn-primary{background:var(--dsw-alias-brand-primary);border-color:var(--dsw-alias-brand-primary);color:#fff}
+.rt-btn-primary{background:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-label-primary);color:var(--dsw-alias-bg-layer-2)}
 .rt-btn-primary:hover{opacity:.9}
 .rt-btn:disabled{opacity:.5;cursor:default}
 .rt-tabs{display:flex;flex-wrap:wrap;gap:2px;padding:6px 12px 0;border-bottom:1px solid var(--dsw-alias-border-l1)}
 .rt-tab{padding:8px 10px 7px;border-radius:0;cursor:pointer;font-size:12.5px;color:var(--dsw-alias-label-secondary);
   display:inline-flex;align-items:center;gap:5px;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent}
 .rt-tab:hover{color:var(--dsw-alias-label-primary)}
-.rt-tab.on{color:var(--dsw-alias-label-primary);background:transparent;font-weight:600;border-bottom-color:var(--dsw-alias-brand-primary,#6dbf8c)}
+.rt-tab.on{color:var(--dsw-alias-label-primary);background:transparent;font-weight:600;border-bottom-color:var(--dsw-alias-label-primary)}
 /* 未读红点：该页签有新内容（新资产/新漏洞/新得分/新步骤…），点开看过就消失 */
 .rt-tab-dot{width:7px;height:7px;border-radius:50%;background:#ef4444;flex:none;
   box-shadow:0 0 0 2px color-mix(in srgb, #ef4444 22%, transparent)}
@@ -2779,13 +2210,13 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 .rt-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 .rt-seg{padding:7px 8px;border-radius:6px;cursor:pointer;margin-bottom:4px;border:1px solid transparent}
 .rt-seg:hover{background:var(--dsw-alias-bg-layer-2)}
-.rt-seg.on{background:var(--dsw-alias-bg-layer-2);border-color:var(--dsw-alias-brand-primary)}
+.rt-seg.on{background:var(--dsw-alias-bg-layer-2);border-color:var(--dsw-alias-label-primary)}
 .rt-seg-cidr{font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
 .rt-seg-meta{font-size:11px;color:var(--dsw-alias-label-secondary);margin-top:2px}
 .rt-toolbar{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--dsw-alias-border-l1);flex-wrap:wrap;align-items:center}
 .rt-input{background:var(--dsw-alias-bg-layer-2);border:1px solid var(--dsw-alias-border-l1);color:inherit;
   border-radius:6px;padding:4px 8px;font-size:12px;font-family:inherit;outline:none;min-width:0}
-.rt-input:focus{border-color:var(--dsw-alias-brand-primary)}
+.rt-input:focus{border-color:var(--dsw-alias-label-primary)}
 .rt-input option,.rt-eng-select option{background:var(--dsw-alias-bg-layer-1,#1c1c1c);color:var(--dsw-alias-label-primary,#f2f2f2)}
 .rt-eng-select{color:var(--dsw-alias-label-primary,#f2f2f2);background:var(--dsw-alias-bg-layer-2,#2a2a2a)}
 .rt-table{flex:1;overflow:auto}
@@ -6931,7 +6362,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 								href: repo,
 								target: "_blank",
 								rel: "noopener noreferrer",
-								style: { color: "var(--dsw-alias-label-brand, #8fbf9a)", wordBreak: "break-all" },
+								style: { color: "var(--dsw-alias-label-brand, var(--dsw-alias-label-primary, #17181a))", wordBreak: "break-all" },
 							}, repo),
 						),
 						h("h3", null, t("welcome.bans")),
@@ -7224,6 +6655,11 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				const ready = !!(r && r.ready);
 				cacheRef.current = { at: Date.now(), ready: ready, skipped: !!(r && r.skipped) };
 				setStatus(r);
+				/* 首次发送时 cache 还没热，弹窗会先出现一次；服务端已记住跳过/已配置就自动收起。 */
+				if (ready && openRef.current) {
+					setOpen(false);
+					setConfirmSkip(false);
+				}
 				return r;
 			}, []);
 
@@ -7504,7 +6940,6 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 				locale: NS,
 				inject: () => ({ t }),
 			}, SettingsPage));
-			installSettingsNavIcon(ctx, () => t("page.nav"));
 			ctx.slots.inject("shell.overlay", () => ctx.slots.register({
 				name: "shell.overlay",
 				id: "dsh-purge-runtime",

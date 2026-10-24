@@ -14,6 +14,8 @@ const load = (name) => import(pathToFileURL(path.join(pluginDir, "lib", name)).h
 const jsonSafe = await load("json-safe.js");
 const revision = await load("revision.js");
 const gateModule = await load("tool-gate.js");
+const platformConfig = await load("redteam/platform-config.js");
+const redteamUi = await load("redteam/ui.js");
 
 let pass = 0;
 let fail = 0;
@@ -112,6 +114,22 @@ console.log("\n== revision ==");
   check("second bump", currentRev() === 2 && lastActionInfo().action === "revert");
   resetRevForTests();
   check("reset for tests", currentRev() === 0);
+}
+
+console.log("\n== env adapt skip ==");
+{
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "dsh-purge-env-"));
+  const store = { root };
+  const before = redteamUi.handlePlatformOp(store, { op: "platformEnvAdaptStatus" });
+  check("fresh env is not skipped", before.ok === true && before.skipped === false);
+  const after = redteamUi.handlePlatformOp(store, { op: "platformEnvAdaptSkip", skip: true });
+  check("skip makes env ready", after.ok === true && after.ready === true && after.reason === "skipped");
+  const reread = platformConfig.envAdaptStatus(root);
+  check("skip persists across reads", reread.skipped === true && reread.ready === true);
+  redteamUi.handlePlatformOp(store, { op: "platformEnvAdaptSkip", skip: false });
+  check("skip can be cleared", platformConfig.envAdaptStatus(root).skipped === false);
+  check("unknown op falls through", redteamUi.handlePlatformOp(store, { op: "not-a-platform-op" }) === undefined);
+  fs.rmSync(root, { recursive: true, force: true });
 }
 
 console.log("\n== tool-gate ==");
@@ -242,12 +260,71 @@ console.log("\n== tool-gate ==");
   }
 
   {
+    fs.rmSync(auditFile, { force: true });
     const h = makeCtx("allowed-once");
-    installToolGate(h.ctx, { mode: "enforce", auditPath: () => auditFile, fs, path });
+    installToolGate(h.ctx, { mode: "enforce", approvalReuseMs: 60000, auditPath: () => auditFile, fs, path });
+    const exec = () => ({ name: "purge_apply", arguments: { action: "prompt" }, agent: { id: "a1" }, signal: { aborted: false } });
+    await runPre(h, exec());
+    await runPre(h, exec());
+    const audit = readAudit();
+    check("same operation reuses approval within window", h.requests() === 1, "requests=" + h.requests());
+    check("first approval audited", audit.some((r) => r.decision === "allow" && r.why === "allowed-once"));
+    check("reused call still audited", audit.some((r) => r.decision === "allow" && r.why === "reused-approval"));
+  }
+
+  {
+    const h = makeCtx("allowed-once");
+    installToolGate(h.ctx, { mode: "enforce", approvalReuseMs: 60000, auditPath: () => auditFile, fs, path });
+    const exec = (action) => ({ name: "purge_apply", arguments: { action }, agent: { id: "a1" }, signal: { aborted: false } });
+    await runPre(h, exec("one"));
+    await runPre(h, exec("two"));
+    check("different operation asks again", h.requests() === 2, "requests=" + h.requests());
+  }
+
+  {
+    const h = makeCtx("allowed-once");
+    installToolGate(h.ctx, { mode: "enforce", approvalReuseMs: 60000, auditPath: () => auditFile, fs, path });
+    const exec = (agentId) => ({ name: "purge_apply", arguments: { action: "prompt" }, agent: { id: agentId }, signal: { aborted: false } });
+    await runPre(h, exec("a1"));
+    await runPre(h, exec("a2"));
+    check("different agent asks again", h.requests() === 2, "requests=" + h.requests());
+  }
+
+  {
+    const h = makeCtx("allowed-once");
+    installToolGate(h.ctx, { mode: "enforce", approvalReuseMs: 20, auditPath: () => auditFile, fs, path });
+    const exec = () => ({ name: "purge_apply", arguments: { action: "prompt" }, agent: { id: "a1" }, signal: { aborted: false } });
+    await runPre(h, exec());
+    await new Promise((resolve) => setTimeout(resolve, 40));
+    await runPre(h, exec());
+    check("expired approval asks again", h.requests() === 2, "requests=" + h.requests());
+  }
+
+  {
+    const h = makeCtx("allowed-once");
+    installToolGate(h.ctx, { mode: "enforce", approvalReuseMs: 60000, auditPath: () => auditFile, fs, path });
     const exec = () => ({ name: "purge_apply", agent: {}, signal: { aborted: false } });
     await runPre(h, exec());
     await runPre(h, exec());
-    check("each call requests approval again", h.requests() === 2, "requests=" + h.requests());
+    check("anonymous agent never reuses approval", h.requests() === 2, "requests=" + h.requests());
+  }
+
+  {
+    const h = makeCtx("allowed-once");
+    installToolGate(h.ctx, { mode: "enforce", approvalReuseMs: 60000, auditPath: () => auditFile, fs, path });
+    const exec = () => ({ name: "purge_apply", arguments: { action: "prompt" }, agent: { id: "a1" }, signal: { aborted: false } });
+    const results = await Promise.all([runPre(h, exec()), runPre(h, exec())]);
+    check("concurrent duplicates share one prompt", h.requests() === 1, "requests=" + h.requests());
+    check("both concurrent calls proceed", results.every((x) => x === "next"));
+  }
+
+  {
+    const h = makeCtx("allowed-once");
+    installToolGate(h.ctx, { mode: "enforce", approvalReuseMs: 0, auditPath: () => auditFile, fs, path });
+    const exec = () => ({ name: "purge_apply", arguments: { action: "prompt" }, agent: { id: "a1" }, signal: { aborted: false } });
+    await runPre(h, exec());
+    await runPre(h, exec());
+    check("reuse disabled asks every time", h.requests() === 2, "requests=" + h.requests());
   }
 
   {
