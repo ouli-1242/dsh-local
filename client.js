@@ -229,6 +229,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"action.uninstall": "卸载",
 			"ok.done": "已完成",
 			"err.action": "失败: {error}",
+			"err.stale": "另一个窗口刚改过状态（现在是 rev {rev}，最后一次动作 {last}）。已重新读取，请确认后再点。",
 			"err.status": "读取失败: {error}",
 			"err.override": "读取失败: {error}",
 			"err.rules": "读取失败: {error}",
@@ -538,6 +539,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"action.uninstall": "Uninstall",
 			"ok.done": "Done",
 			"err.action": "Failed: {error}",
+			"err.stale": "Another window changed the state (now rev {rev}, last action {last}). Re-read; check before clicking again.",
 			"err.status": "Read failed: {error}",
 			"err.override": "Read failed: {error}",
 			"err.rules": "Read failed: {error}",
@@ -1306,6 +1308,10 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 			const tRef = useRef(t);
 			tRef.current = t;
 			const [state, setState] = useState(null);
+			/* doAction 的依赖数组很短，直接闭包读 state 会拿到旧值。
+			 * 用 ref 镜像当前状态，动作时才读真实 rev。 */
+			const stateRef = useRef(state);
+			stateRef.current = state;
 			const [override, setOverride] = useState("");
 			const [defaultOverride, setDefaultOverride] = useState("");
 			const [overrideLoaded, setOverrideLoaded] = useState(false);
@@ -1394,14 +1400,25 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 					setAskRestart(false);
 					setNotice({ kind: "idle", text: "" });
 					const applyContent = action === "apply" ? readPromptBox() : "";
+					/* 带上当前修订号：两个窗口同时开着，后点的那个会被服务端 409 挡住，
+					 * 而不是静默覆盖先点的结果。rev 来自 /status 与上一次动作的响应。 */
+					const body = action === "apply" ? { content: applyContent, rev: stateRef.current?.rev } : { rev: stateRef.current?.rev };
 					fetch("/dsh-purge/" + action, {
 						method: "POST",
 						headers: { "content-type": "application/json" },
-						body: JSON.stringify(action === "apply" ? { content: applyContent } : {}),
+						body: JSON.stringify(body),
 					})
-						.then((r) => r.json())
-						.then((d) => {
+						.then((r) => r.json().then((d) => ({ status: r.status, d })))
+						.then(({ status, d }) => {
 							if (ticket !== actionTicket.current) return;
+							if (status === 409 && d && d.stale) {
+								/* 过期写入：说明别的窗口已经动过。提示后自动重新拉一次状态，
+								 * 让界面回到真实值，而不是留着旧数字让用户重复点击。 */
+								setNotice({ kind: "error", text: tr("err.stale", { rev: String(d.rev ?? "?"), last: String(d.last?.action || "?") }) });
+								if (typeof d.rev === "number") setState((prev) => ({ ...(prev || {}), rev: d.rev }));
+								loadAll();
+								return;
+							}
 							if (responseNeedsPrompt(d)) {
 								rejectNeedPrompt(tr);
 								return;
@@ -1410,6 +1427,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-ops button.primary{background:var(--ds
 								setNotice({ kind: "error", text: tr("err.action", { action: label, error: d.error || "" }) });
 								return;
 							}
+							if (typeof d.rev === "number") setState((prev) => ({ ...(prev || {}), rev: d.rev }));
 							if (action === "apply") {
 								if (typeof d.defaultContent === "string") setDefaultOverride(d.defaultContent);
 								if (typeof d.override_content === "string") {

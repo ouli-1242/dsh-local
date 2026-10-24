@@ -59,4 +59,4 @@ dsh-purge --uninstall
 
 ## 许可
 
-MIT License，版权声明见 [LICENSE](LICENSE)。仓库内含第三方 MIT 代码，其版权与使用声明见 [docs/redteam-upstream-LICENSE](docs/redteam-upstream-LICENSE) 和 [docs/redteam-upstream-DISCLOSURE](docs/redteam-upstream-DISCLOSURE)。
+MIT License，版权声明见 [LICENSE](LICENSE)。本仓库基于上游项目的修改版本，工程加固的来源、第三方代码与署名见 [NOTICE.md](NOTICE.md)；红队代码的原始许可见 [docs/redteam-upstream-LICENSE](docs/redteam-upstream-LICENSE) 和 [docs/redteam-upstream-DISCLOSURE](docs/redteam-upstream-DISCLOSURE)。

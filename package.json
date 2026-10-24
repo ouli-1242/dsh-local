@@ -26,15 +26,22 @@
     "presets",
     "skills",
     "scripts",
+    "test/",
     "client.js",
     "cordis.patch.yml",
     "screenshots.json",
     "README.md",
+    "NOTICE.md",
     "LICENSE"
   ],
   "scripts": {
     "embed-prompt": "node scripts/embed-default-prompt.mjs",
-    "build:client": "node scripts/build-client.mjs"
+    "build:client": "node scripts/build-client.mjs",
+    "test": "node test/core.mjs && node test/hostfs-sync.mjs && node test/config.mjs",
+    "test:core": "node test/core.mjs",
+    "test:hostfs": "node test/hostfs-sync.mjs",
+    "test:config": "node test/config.mjs",
+    "compat": "node scripts/compat-check.mjs"
   },
   "license": "MIT",
   "keywords": [
