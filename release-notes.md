@@ -1,3 +1,21 @@
+# 1.2.0
+
+## 中文
+
+- 设置页收口为补丁、规则、演练台三段；普通技能管理交给工具管理插件，移除重复的技能页、`/skills` 命令和接口。
+- 移除地区与目标 IP 门禁，以及自有服务器白名单入口；使用范围仍以授权和审计为边界。
+- 恢复环境适配接口；「暂不配置」会持久化，环境就绪后发送门禁自动收起，不再反复弹窗。
+- 审批门在有效期内复用同一会话、同一工具与操作的确认，每次调用仍写审计；并发同类调用共用一个确认。
+- 移除失效的演练台兜底入口，清理旧主题、重启提示等残留；仓库地址与文档同步为 `dsh-purge-ouli`。
+
+## English
+
+- Settings now has three sections: patches, rules, and drill. General skill management moves to the tool-management plugin; the duplicate skills page, `/skills` command, and HTTP routes are removed.
+- Removed the region/target-IP gate and the own-server allowlist entry. Authorization and audit remain the boundary.
+- Restored the env-adaptation ops. "Skip for now" persists, and the send gate closes automatically once ready instead of prompting again.
+- Approval gates reuse one confirmation for the same session/tool/action within the window while every call is still audited; concurrent duplicates share one prompt.
+- Removed the dead drill fallback and legacy theme/restart remnants. Repository metadata and docs now point to `dsh-purge-ouli`.
+
 # 1.1.72
 
 ## 中文
