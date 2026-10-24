@@ -71,8 +71,8 @@
     },
     "install": {
       "preferred": "tarball",
-      "tarball": "https://github.com/ouli-1242/dsh-purge/archive/refs/heads/master.tar.gz",
-      "zip": "https://github.com/ouli-1242/dsh-purge/archive/refs/heads/master.zip",
+      "tarball": "https://github.com/ouli-1242/dsh-purge/archive/refs/heads/main.tar.gz",
+      "zip": "https://github.com/ouli-1242/dsh-purge/archive/refs/heads/main.zip",
       "git": "https://github.com/ouli-1242/dsh-purge.git"
     }
   },
