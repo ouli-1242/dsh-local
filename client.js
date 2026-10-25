@@ -113,8 +113,28 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"page.seg.armor": "补丁",
 			"page.seg.rules": "规则",
 			"page.seg.drill": "演练台",
-			"page.drill.lead": "演练台只在你完成授权后可进入。授权一次即可，之后可随时使用。",
+			"page.drill.lead": "演练台是红队演练面板：资产测绘、测试记录、战果与报告。只用于你有权管理的环境；授权一次即可，之后随时使用。",
 			"page.drill.authorize": "完成授权",
+			"qs.title": "三步上手",
+			"qs.dismiss": "我知道怎么用了",
+			"qs.reopen": "新手引导",
+			"qs.step1": "定位 DSH 安装目录",
+			"qs.step1.done": "已定位，可以打补丁",
+			"qs.step1.web": "没定位到：完全退出当前 DSH 窗口，重新打开后再进本页",
+			"qs.step1.desktop": "官方客户端代码在 app.asar 里，点「应用」会自动解开；一直未定位就完全退出客户端再重开",
+			"qs.step2": "点「应用」写入补丁",
+			"qs.step2.done": "补丁已写入",
+			"qs.step2.todo": "点下方「应用」按钮，等提示完成",
+			"qs.step3": "重启并新开对话",
+			"qs.step3.note": "应用成功会自动重启；重启后新开一轮对话才生效",
+			"qs.glossary": "名词解释：补丁 / shim / 各状态是什么意思",
+			"qs.glossary.patch": "补丁：对 DSH 安装文件的小改动，用来替换内置提示词、放开审批与沙箱限制。",
+			"qs.glossary.shim": "shim：命令行 dsh-purge 命令在各终端（cmd / powershell / unix）的可用状态；本端用不到会显示 n/a。",
+			"qs.glossary.backup": "备份：改动前的原文件保存为 .dshpurge.bak，随时可点「还原」恢复。",
+			"qs.glossary.status": "状态：已应用＝已写入；待应用＝还没写入；跳过＝本机没有对应文件，不需要；没对上＝版本变了，点「应用」重写。",
+			"qs.glossary.hooks": "Hooks 拦截：控制你自己的 hooks 的 deny 是否生效，默认放行；改完要点「应用」。",
+			"override.lead": "这个框是发给 AI 的自定义提示词。没特殊需要就保持默认内容，直接用上方「应用」即可。",
+			"rules.lead": "规则是按项目注入的额外指令（AGENTS.md / CLAUDE.md）。新手可以先不管；想给某个项目固定加指令时再建。",
 			"welcome.title": "用户须知",
 			"welcome.lead": "首次安装本插件时请阅读以下说明。确认后本窗不再弹出。",
 			"welcome.warn": "本插件按 MIT 许可证提供。请只在有权管理的机器或已获授权的环境中使用。",
@@ -156,11 +176,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"metric.unmatchedShort": "没对上 {n}",
 			"metric.skipShort": "跳过 {n}",
 			"metric.unlocated.count": "—",
-			"metric.shim": "shim",
+			"metric.shim": "shim（命令行入口）",
 			"metric.shim.na": "本端不需要",
 			"metric.bak.yes": "有备份",
 			"metric.bak.no": "无备份",
-			"metric.bak.hint": "备份",
+			"metric.bak.hint": "改动前的原文件已保存，可随时「还原」",
 			"table.patch": "项目",
 			"table.status": "状态",
 			"status.applied": "已应用",
@@ -209,7 +229,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"rules.none": "无",
 			"rules.reset": "还原",
 			"rules.reset.confirm": "还原全局指令文件？规则库会保留。",
-			"rules.empty": "暂无规则",
+			"rules.empty": "暂无规则。在下方输入 id 和名称点「新建」；创建后点「启用」才会生效。",
 			"rules.pick": "选择规则",
 			"policy.title": "工作区策略",
 			"policy.strict": "严格",
@@ -228,8 +248,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.use": "启用",
 			"btn.inUse": "当前",
 			"confirm.delete": "删除 {id}？",
-			"ph.id": "id",
-			"ph.alias": "名称",
+			"ph.id": "id（英文标识）",
+			"ph.alias": "名称（可选）",
 			"ph.alias.short": "名称",
 			"btn.create": "新建",
 			"need.id": "需要 id",
@@ -368,8 +388,28 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"page.seg.armor": "Patches",
 			"page.seg.rules": "Rules",
 			"page.seg.drill": "Drill",
-			"page.drill.lead": "The drill console becomes available after a one-time authorization.",
+			"page.drill.lead": "The drill console is a red-team panel: assets, testing records, findings, and reports. Use it only in environments you are authorized to manage; authorize once, then use it anytime.",
 			"page.drill.authorize": "Authorize",
+			"qs.title": "Quick start in three steps",
+			"qs.dismiss": "Got it",
+			"qs.reopen": "Quick start",
+			"qs.step1": "Locate the DSH install folder",
+			"qs.step1.done": "Located — ready to patch",
+			"qs.step1.web": "Not located: fully quit this DSH window and reopen it, then come back here",
+			"qs.step1.desktop": "The official client keeps its code in app.asar; Apply unpacks it. If it stays unlocated, fully quit the client and reopen",
+			"qs.step2": "Press Apply to write the patches",
+			"qs.step2.done": "Patches written",
+			"qs.step2.todo": "Press the Apply button below and wait for it to finish",
+			"qs.step3": "Restart and start a new conversation",
+			"qs.step3.note": "Apply restarts the host automatically on success; the change takes effect in a new conversation after the restart",
+			"qs.glossary": "Glossary: what patch / shim / each status means",
+			"qs.glossary.patch": "Patch: a small change to installed DSH files that swaps built-in prompts and relaxes approval and sandbox gates.",
+			"qs.glossary.shim": "shim: availability of the dsh-purge command-line entry per terminal (cmd / powershell / unix); n/a means this host doesn't need it.",
+			"qs.glossary.backup": "Backup: original files are kept as .dshpurge.bak; Restore reverts anytime.",
+			"qs.glossary.status": "Statuses: Applied = written; Pending = not written yet; Skipped = the file is not on this machine, not needed; No match = version changed, press Apply to rewrite.",
+			"qs.glossary.hooks": "Hooks: controls whether your own hooks' deny verdicts apply; allowed by default. Press Apply after changing.",
+			"override.lead": "This box holds the custom prompt sent to the AI. Keep the default unless you need something special; just press Apply above.",
+			"rules.lead": "Rules are extra per-project instructions (AGENTS.md / CLAUDE.md). Beginners can skip this; create one only when a project needs fixed instructions.",
 			"welcome.title": "User notice",
 			"welcome.lead": "Please read this on first install. After you confirm, it will not appear again.",
 			"welcome.warn": "Provided under the MIT License. Use it only on machines or in environments you are authorized to manage.",
@@ -411,11 +451,11 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"metric.unmatchedShort": "No match {n}",
 			"metric.skipShort": "Skipped {n}",
 			"metric.unlocated.count": "—",
-			"metric.shim": "shim",
+			"metric.shim": "shim (command line)",
 			"metric.shim.na": "Not needed here",
 			"metric.bak.yes": "Backup",
 			"metric.bak.no": "No backup",
-			"metric.bak.hint": "Backup",
+			"metric.bak.hint": "Original files saved; Restore anytime",
 			"table.patch": "Item",
 			"table.status": "Status",
 			"status.applied": "Applied",
@@ -464,7 +504,7 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"rules.none": "None",
 			"rules.reset": "Restore",
 			"rules.reset.confirm": "Restore global instruction files? The rule library is kept.",
-			"rules.empty": "No rules",
+			"rules.empty": "No rules yet. Enter an id and a name below, press Create, then press Enable to make it take effect.",
 			"rules.pick": "Select a rule",
 			"policy.title": "Workspace policy",
 			"policy.strict": "Strict",
@@ -483,8 +523,8 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 			"btn.use": "Enable",
 			"btn.inUse": "On",
 			"confirm.delete": "Delete {id}?",
-			"ph.id": "id",
-			"ph.alias": "Name",
+			"ph.id": "id (english)",
+			"ph.alias": "Name (optional)",
 			"ph.alias.short": "Name",
 			"btn.create": "New",
 			"need.id": "id required",
@@ -727,6 +767,25 @@ window.__ModuleLoader__.load({ id: "dsh-purge", factory: (require) => {
 .dshp-modal h4{margin:0 0 8px;font-size:15px;font-weight:600;line-height:22px}
 .dshp-modal p{margin:0 0 16px;font-size:13px;line-height:1.6;color:var(--dshp-mute)}
 .dshp-modal-ops{display:flex;justify-content:flex-end;gap:8px}
+.dshp-qs{border:1px solid color-mix(in srgb,var(--dshp-ok) 30%,var(--dshp-line));border-radius:10px;background:color-mix(in srgb,var(--dshp-ok) 4%,var(--dshp-paper));padding:12px 14px;margin:0 0 12px}
+.dshp-qs-head{display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.dshp-qs-head h4{margin:0;font-size:13px;font-weight:600;flex:1;color:var(--dshp-ink)}
+.dshp-qs-steps{display:flex;flex-direction:column;gap:9px;margin:0;padding:0;list-style:none}
+.dshp-qs-step{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.5}
+.dshp-qs-step.is-wait{opacity:.55}
+.dshp-qs-n{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--dshp-line);display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--dshp-mono);color:var(--dshp-mute);background:var(--dshp-paper);margin-top:1px;box-sizing:border-box}
+.dshp-qs-step.is-done .dshp-qs-n{border-color:var(--dshp-ok);color:var(--dshp-ok)}
+.dshp-qs-step.is-now .dshp-qs-n{border-color:var(--dshp-ink);background:var(--dshp-ink);color:var(--dshp-paper)}
+.dshp-qs-txt{min-width:0}
+.dshp-qs-txt b{font-weight:600;color:var(--dshp-ink)}
+.dshp-qs-txt span{display:block;font-size:12px;color:var(--dshp-mute)}
+.dshp-gloss{margin:10px 0 0;border-top:1px solid var(--dshp-line);padding-top:8px}
+.dshp-gloss summary{cursor:pointer;font-size:12px;color:var(--dshp-mute);user-select:none;list-style:none}
+.dshp-gloss summary::-webkit-details-marker{display:none}
+.dshp-gloss summary::before{content:"›";display:inline-block;margin-right:4px;transition:transform .15s var(--dshp-ease)}
+.dshp-gloss[open] summary::before{transform:rotate(90deg)}
+.dshp-gloss summary:hover{color:var(--dshp-ink)}
+.dshp-gloss ul{margin:8px 0 0;padding-left:18px;font-size:12px;line-height:1.6;color:var(--dshp-mute);display:flex;flex-direction:column;gap:4px}
 .dshp-restart-mask{position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.4);font-family:"Segoe UI Variable Text","Segoe UI","Microsoft YaHei UI","PingFang SC",system-ui,sans-serif}
 .dshp-restart-card{width:min(420px,100%);box-sizing:border-box;padding:20px;border-radius:14px;background:var(--dsw-alias-bg-layer-2,#fff);color:var(--dsw-alias-label-primary,#17181a);border:1px solid var(--dsw-alias-border-l1,#e3e5e8);box-shadow:0 16px 48px rgba(0,0,0,.2)}
 .dshp-restart-card h4{margin:0 0 8px;font-size:16px;font-weight:600;line-height:24px;color:inherit}
@@ -1101,6 +1160,41 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
 			return node;
 		}
 
+		/* 新手引导卡：三步上手，按当前状态点亮；关掉后记进 localStorage，标题行可重新打开。 */
+		const QUICKSTART_KEY = "dshpurge.quickstart.v1";
+
+		function quickStartDismissed() {
+			try { return window.localStorage.getItem(QUICKSTART_KEY) === "1"; } catch { return false; }
+		}
+
+		function QuickStartCard({ t, located, hostSurface, total, pending, unmatched, onDismiss }) {
+			const allApplied = located && total > 0 && pending === 0 && unmatched === 0;
+			const steps = [
+				located
+					? { state: "done", text: t("qs.step1"), note: t("qs.step1.done") }
+					: { state: "now", text: t("qs.step1"), note: hostSurface === "desktop" ? t("qs.step1.desktop") : t("qs.step1.web") },
+				allApplied
+					? { state: "done", text: t("qs.step2"), note: t("qs.step2.done") }
+					: { state: located ? "now" : "wait", text: t("qs.step2"), note: t("qs.step2.todo") },
+				{ state: allApplied ? "now" : "wait", text: t("qs.step3"), note: t("qs.step3.note") },
+			];
+			return h("div", { className: "dshp-qs" },
+				h("div", { className: "dshp-qs-head" },
+					h("h4", null, t("qs.title")),
+					h(Btn, { tiny: true, onClick: onDismiss }, t("qs.dismiss")),
+				),
+				h("ol", { className: "dshp-qs-steps" },
+					steps.map((s, i) => h("li", { key: s.text, className: "dshp-qs-step is-" + s.state },
+						h("span", { className: "dshp-qs-n", "aria-hidden": "true" }, s.state === "done" ? "✓" : String(i + 1)),
+						h("span", { className: "dshp-qs-txt" },
+							h("b", null, s.text),
+							h("span", null, s.note),
+						),
+					)),
+				),
+			);
+		}
+
 		function PurgifySection() {
 			const t = useT();
 			const tRef = useRef(t);
@@ -1119,6 +1213,15 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
 			const [askUninstall, setAskUninstall] = useState(false);
 			const [uninstallBusy, setUninstallBusy] = useState(false);
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
+			const [guideOff, setGuideOff] = useState(quickStartDismissed);
+			const dismissGuide = useCallback(() => {
+				setGuideOff(true);
+				try { window.localStorage.setItem(QUICKSTART_KEY, "1"); } catch { /* ignore */ }
+			}, []);
+			const reopenGuide = useCallback(() => {
+				setGuideOff(false);
+				try { window.localStorage.removeItem(QUICKSTART_KEY); } catch { /* ignore */ }
+			}, []);
 			const actionTicket = useRef(0);
 			const overrideRef = useRef("");
 			const defaultOverrideRef = useRef("");
@@ -1424,8 +1527,20 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
 			return h("section", { className: "dshp-panel", "aria-label": t("purge.title") },
 				h("div", { className: "dshp-head" },
 					h("h3", { className: "dshp-title" }, t("purge.title")),
-					h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
+					h("div", { className: "dshp-row", style: { margin: 0 } },
+						guideOff ? h(Btn, { tiny: true, onClick: reopenGuide }, t("qs.reopen")) : null,
+						h("span", { className: "dshp-pill" }, t("surface." + hostSurface)),
+					),
 				),
+				s && !guideOff ? h(QuickStartCard, {
+					t: t,
+					located: located,
+					hostSurface: hostSurface,
+					total: tally.total,
+					pending: tally.pending,
+					unmatched: tally.unmatched,
+					onDismiss: dismissGuide,
+				}) : null,
 				s ? h("div", { className: "dshp-metrics" },
 					h("div", { className: "dshp-metric" },
 						h("b", null, located ? (applied + " / " + total) : (patchesLost ? t("metric.lost.count") : (sealedReady ? t("metric.sealed.count") : t("metric.unlocated.count")))),
@@ -1451,8 +1566,7 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
 					h("div", { className: "dshp-metric" }, h("div", { className: "dshp-skel" }), h("div", { className: "dshp-skel", style: { width: "40%" } })),
 				),
 				h("div", { className: "dshp-bar", "aria-hidden": "true" }, h("i", { style: { width: pct + "%" } })),
-				h(PatchGroups, { state: s }),
-				h(HooksDenySection, { onSaved: loadAll }),
+				s && !s.ai_base ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-bad, #cf222e)", fontSize: 12 } }, hostText(t, "warn.noRoot", hostSurface)) : null,
 				h("div", { className: "dshp-row", style: { marginTop: 14 } },
 					h(Btn, { kind: "primary", disabled: patchBusy || uninstallBusy || !overrideLoaded, onClick: () => doAction("apply", "action.apply") }, patchBusy ? t("btn.apply.busy") : t("btn.apply")),
 					h(Btn, { kind: "danger", disabled: patchBusy || uninstallBusy, onClick: () => doAction("revert", "action.revert") }, t("btn.revert")),
@@ -1476,22 +1590,18 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
 					),
 				) : null,
 				h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("apply.hint")),
-				s && !s.ai_base ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-bad, #cf222e)", fontSize: 12 } }, hostText(t, "warn.noRoot", hostSurface)) : null,
-				s && s.ai_base && s.override_status === "missing" ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("warn.noInject")) : null,
-				askRestart ? h(RestartAsk, {
-					t: t,
-					theme: detectHostTheme(),
-					onLater: () => {
-						suppressRestartAsk.current = true;
-						setAskRestart(false);
-					},
-					onRestart: () => {
-						suppressRestartAsk.current = true;
-						setAskRestart(false);
-						restartDsh(setNotice, function () {}, t, hostSurface);
-					},
-				}) : null,
-				// h(ContinueRetrySection, null),
+				h("details", { className: "dshp-gloss" },
+					h("summary", null, t("qs.glossary")),
+					h("ul", null,
+						h("li", null, t("qs.glossary.patch")),
+						h("li", null, t("qs.glossary.shim")),
+						h("li", null, t("qs.glossary.backup")),
+						h("li", null, t("qs.glossary.status")),
+						h("li", null, t("qs.glossary.hooks")),
+					),
+				),
+				h(PatchGroups, { state: s }),
+				h(HooksDenySection, { onSaved: loadAll }),
 				h("div", { className: "dshp-sub" },
 					h("h4", null, t("override.title")),
 					h("div", { className: "dshp-row", style: { margin: 0 } },
@@ -1499,6 +1609,7 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
 						h(Btn, { tiny: true, disabled: patchBusy || !overrideLoaded || !defaultOverride, onClick: restoreOverride }, t("btn.restoreInject")),
 					),
 				),
+				h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("override.lead")),
 				h("textarea", {
 					className: "dshp-area",
 					ref: promptAreaRef,
@@ -1514,6 +1625,21 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
 					className: "dshp-hint",
 					style: { margin: "8px 0 0", color: "var(--dshp-bad, #cf222e)", fontSize: 12 },
 				}, t("need.prompt")) : null,
+				s && s.ai_base && s.override_status === "missing" ? h("p", { className: "dshp-hint", style: { margin: "8px 0 0", color: "var(--dshp-mute)", fontSize: 12 } }, t("warn.noInject")) : null,
+				askRestart ? h(RestartAsk, {
+					t: t,
+					theme: detectHostTheme(),
+					onLater: () => {
+						suppressRestartAsk.current = true;
+						setAskRestart(false);
+					},
+					onRestart: () => {
+						suppressRestartAsk.current = true;
+						setAskRestart(false);
+						restartDsh(setNotice, function () {}, t, hostSurface);
+					},
+				}) : null,
+				// h(ContinueRetrySection, null),
 			);
 		}
 
@@ -1671,6 +1797,7 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
 					),
 				),
 				h("div", { className: "dshp-block" },
+					h("p", { className: "dshp-block-hint", style: { margin: "0 0 10px" } }, t("rules.lead")),
 					h("div", { className: "dshp-policy-row" },
 						h("label", { htmlFor: "dshp-policy-select" }, t("policy.title")),
 						h("select", {
@@ -3243,7 +3370,12 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
       }
 
       const listPane = h('div', { className: 'rt-table' }, head, rowNodes,
-        !state.loading && !state.items.length ? h('div', { className: 'rt-empty' }, '没有匹配的资产') : null)
+        !state.loading && !state.items.length
+          ? h('div', { className: 'rt-empty' },
+              (snapshot && snapshot.stats && snapshot.stats.assets)
+                ? '没有匹配的资产：清掉搜索词和筛选条件，或点「刷新」再看'
+                : '还没有资产。回对话框发测绘指令（如「对 192.168.1.0/24 做被动测绘」），结果会自动出现在这里')
+          : null)
 
       /* 域名维度：域名 → 关联资产 */
       const domainPane = h('div', { className: 'rt-table' },
@@ -6083,7 +6215,12 @@ body[data-ds-dark-theme] .dshp-auth-mask{--dshp-warn:#e3b341;--dshp-bad:#ff7b72}
           h('div', { className: 'rt-card' },
             h('h4', null, '还没有靶标'),
             h('div', { style: { fontSize: 12, color: 'var(--dsw-alias-label-secondary)', marginBottom: 8 } },
-              '输入攻防演练靶标单位名称，创建演练并开始资产测绘。'),
+              '输入攻防演练靶标单位名称，创建演练并开始资产测绘。新手按这个顺序走：'),
+            h('ol', { style: { margin: '0 0 10px', paddingLeft: 18, fontSize: 12, lineHeight: 1.9, color: 'var(--dsw-alias-label-secondary)' } },
+              h('li', null, '下面输入名称，点「创建靶标」'),
+              h('li', null, '回到对话框直接发指令（如「对 192.168.1.0/24 做被动测绘」），资产会自动进「资产测绘」'),
+              h('li', null, '继续在对话里测试；战果自动进「漏洞战果」，正在跑的看「当前测试」侧栏'),
+              h('li', null, '在「报告」页一键复制 / 导出演练报告')),
             h('div', { style: { display: 'flex', gap: 8 } },
               h('input', {
                 className: 'rt-input', style: { flex: 1 }, placeholder: '例如：示例科技有限公司',
