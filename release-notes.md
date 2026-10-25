@@ -1,3 +1,21 @@
+# 1.2.1
+
+## 中文
+
+- 补丁页新增「三步上手」引导卡：定位目录 → 点「应用」→ 重启并新开对话，按当前状态自动点亮；可关闭并从标题行重新打开（中英双语）。
+- 「应用 / 还原 / 卸载」主操作上移到状态条之后，不必再滚过补丁分组和 Hooks 才能找到；未定位宿主的警告跟着上移。
+- 新增「名词解释」折叠块：补丁、shim、备份、各状态与 Hooks 拦截各一句话说明；shim 与备份指标文案改为白话。
+- 规则页顶部补一句定位说明，空状态改为完整的建规则指引，输入框占位符更明确。
+- 演练台：授权前说明先讲用途；未建靶标时给出四步上手流程；资产列表空状态区分「从没有资产」与「被筛选挡住」。
+
+## English
+
+- The Patches tab gains a dismissible "Quick start in three steps" card: locate the folder, press Apply, restart and start a new conversation. Steps light up from live status and can be re-opened from the section header (zh/en).
+- Apply / Restore / Uninstall move up next to the status bar instead of hiding below the patch groups; the host-not-located warning moves with them.
+- A new "Glossary" details block explains patches, shim, backups, statuses, and the Hooks toggle in plain language; the shim and backup metric labels are clearer.
+- The Rules page gets a one-line intro, a full create-first-rule guide in the empty state, and clearer input placeholders.
+- Drill: the pre-auth card explains what the console is first; the no-engagement state shows a four-step path; the empty asset list distinguishes "no assets yet" from "filtered out".
+
 # 1.2.0
 
 ## 中文
